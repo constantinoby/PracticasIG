@@ -70,17 +70,13 @@ void reshape(int width, int height) {
 	//un print de width y height para ver que valores se reciben
 	printf(" Etapa 1 = width: %d, height: %d\n", width, height);
 	
-	glViewport(0, 0, width, height);
+	glViewport(0, 0, (GLsizei)width, (GLsizei)height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	double aspect = (double)width / (double)height;
-	if (aspect > 1.0) {
-		glOrtho(-aspect, aspect, -1.0, 1.0, -1.0, 1.0);
-	}
-	else {
-		glOrtho(-1.0, 1.0, -1.0 / aspect, 1.0 / aspect, -1.0, 1.0);
-	}
+	gluPerspective(60.0, (GLfloat)width/ (GLfloat) height,1.0,20.0);
 	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	gluLookAt(0.0,0.0,5.0,0.0,0.0,0.0,0.0,1.0,0.0);
 }
 
 
