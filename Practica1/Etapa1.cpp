@@ -63,6 +63,7 @@ void Display(void)
 	glPopMatrix();
 
 	glFlush();
+	glutSwapBuffers();
 }
 
 // Función que se ejecuta cuando se redimensiona la ventana
@@ -92,7 +93,6 @@ void Idle(void)
 		fAngulo -= 360;
 	// Indicamos que es necesario repintar la pantalla
 	glutPostRedisplay();
-	glutSwapBuffers();
 
 }
 
