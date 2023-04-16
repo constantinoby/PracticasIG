@@ -18,6 +18,9 @@ float massAlpha = 1.0f;
 float massBeta = 2.0f;
 float lenghtAlpha = 1.0f;
 float lenghtBeta = 1.0f;
+float velAlpha = 0.0f;
+float velBeta = 0.0f;
+float dt = 0.1f;
 float alphaIncrement = 0.03f;
 float betaIncrement = 0.03f;
 
@@ -29,24 +32,24 @@ float radsToGrads(float rads) {
 	return (rads * 180) / pi;
 }
 
-float predictAlpha() {
+float predictAccAlpha() {
 	float alphaRad = gradsToRads(alpha);
 	float betaRad = gradsToRads(beta);
 	float aux = (- g) * (2 * massAlpha + massBeta) * sin(alphaRad) - massBeta * g * sin(alphaRad + (- 2) * betaRad);
-	float aux2 = (- 2) * sin(alphaRad - betaRad) * massBeta * ((betaRad * betaRad) * lenghtBeta + (alphaRad * alphaRad) * lenghtAlpha * cos(alphaRad - betaRad));
+	float aux2 = (- 2) * sin(alphaRad - betaRad) * massBeta * ((velBeta * velBeta) * lenghtBeta + (velAlpha * velAlpha) * lenghtAlpha * cos(alphaRad - betaRad));
 	float aux3 = lenghtAlpha * (2 * massAlpha + massBeta - massBeta * cos(2 * alphaRad - 2 * betaRad));
-	float result = (aux + aux2) / (aux3);
-	return radsToGrads(result);
+	float accAlpha = (aux + aux2) / (aux3);
+	return accAlpha;
 }
 
-float predictBeta() {
+float predictAccBeta() {
 	float alphaRad = gradsToRads(alpha);
 	float betaRad = gradsToRads(beta);
-	float aux = 2 * sin(alphaRad - betaRad) * ((alphaRad * alphaRad) * lenghtAlpha * (massAlpha + massBeta)
-		+ g * (massAlpha + massBeta) * cos(alphaRad) +(betaRad * betaRad)*lenghtBeta*massBeta*cos(alphaRad - betaRad));
+	float aux = 2 * sin(alphaRad - betaRad) * ((velAlpha * velAlpha) * lenghtAlpha * (massAlpha + massBeta)
+		+ g * (massAlpha + massBeta) * cos(alphaRad) + (velBeta * velBeta) * lenghtBeta * massBeta * cos(alphaRad - betaRad));
 	float aux2 = lenghtBeta * (2 * massAlpha + massBeta - massBeta * cos(2 * alphaRad - 2 * betaRad));
-	float result = aux / aux2;
-	return radsToGrads(result);
+	float accBeta = aux / aux2;
+	return accBeta;
 }
 
 void drawDoblePendulum() {
@@ -119,31 +122,45 @@ void reshape(int width, int height) {
 
 void idle() {
 	printf("Esto vale alpha %f    ------------    ", alpha);
-	float nextAlpha = predictAlpha();
-	float nextBeta = predictBeta();
-	while (nextAlpha >= 360) {
-		nextAlpha -= 360;
+	//Calculamos las aceleraciones angulares
+	float accAlpha = predictAccAlpha();
+	float accBeta = predictAccBeta();
+	//Actualizamos las velocidades angulares
+	velAlpha = velAlpha + accAlpha * dt;
+	velBeta = velBeta + accBeta * dt;
+	//Pasamos los grados de los angulos usados a radianes para actualizarlos
+	float alphaRad = gradsToRads(alpha);
+	float betaRad = gradsToRads(beta);
+	//actualizamos los angulos
+	alphaRad = alphaRad + velAlpha * dt;
+	betaRad = betaRad + velBeta * dt;
+	//los volvemos a transformar a grados para que sean representados
+	alpha = radsToGrads(alphaRad);
+	beta = radsToGrads(betaRad);
+	//evitamos cualquier underflow y overflow
+	while (alpha >= 360) {
+		alpha -= 360;
 	}
-	while (nextAlpha < 0) {
-		nextAlpha += 360;
+	while (alpha < 0) {
+		alpha += 360;
 	}
-	while (nextBeta >= 360) {
-		nextBeta -= 360;
+	while (beta >= 360) {
+		beta -= 360;
 	}
-	while (nextBeta < 0) {
-		nextBeta += 360;
+	while (beta < 0) {
+		beta += 360;
 	}
 	//nextAlpha = (nextAlpha - alpha) / 10;
 	//nextBeta = (nextBeta - beta) / 10;
-	alpha = nextAlpha;
-	beta = nextBeta;
+	/*alpha = nextAlpha;
+	beta = nextBeta;*/
 	printf("Ahora vale %f   ||||||||", alpha);
 	glutPostRedisplay();
 }
 
 void timer(int iUnused) {
 	idle();
-	glutTimerFunc(300, timer, 0);
+	glutTimerFunc(30, timer, 0);
 }
 
 int main(int argc, char** argv) {
@@ -157,12 +174,12 @@ int main(int argc, char** argv) {
 	glutCreateWindow("Pendulo");
 	// Indicamos cuales son las funciones de redibujado e idle
 	glutDisplayFunc(display);
-	glutIdleFunc(idle);
+	//glutIdleFunc(idle);
 	glutReshapeFunc(reshape);
 	// El color de fondo ser� el negro (RGBA, RGB + Alpha channel)
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glOrtho(-1.0, 1.0f, -1.0, 1.0f, -1.0, 1.0f);
-	//timer(0);
+	timer(0);
 	// Comienza la ejecuci�n del core de GLUT
 	glutMainLoop();
 	return 0;
