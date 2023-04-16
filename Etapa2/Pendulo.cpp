@@ -9,50 +9,63 @@
 const int W_WIDTH = 500; // Tama�o incial de la ventana
 const int W_HEIGHT = 500;
 
-const float g = 9.8;
+const float g = 9.8f;
+const float pi = 3.1415f;
 
-GLfloat alpha = 1;
-GLfloat beta = 1;
-float massAlpha = 1;
-float massBeta = 2;
-float lenghtAlpha = 1;
-float lenghtBeta = 1;
+GLfloat alpha = 28.64f;
+GLfloat beta = 57.29f;
+float massAlpha = 1.0f;
+float massBeta = 2.0f;
+float lenghtAlpha = 1.0f;
+float lenghtBeta = 1.0f;
 float alphaIncrement = 0.03f;
 float betaIncrement = 0.03f;
 
+float gradsToRads(float grads) {
+	return (grads * pi) / 180;
+}
+
+float radsToGrads(float rads) {
+	return (rads * 180) / pi;
+}
+
 float predictAlpha() {
-	float aux = -g * (2 * massAlpha + massBeta) * sin(alpha) - massBeta * g * sin(alpha - 2 * beta);
-	float aux2 = -2 * sin(alpha - beta) * massBeta * ((beta * beta) * lenghtBeta + (alpha * alpha) * lenghtAlpha * cos(alpha - beta));
-	float aux3 = lenghtAlpha * (2 * massAlpha + massBeta - massBeta * cos(2 * alpha - 2 * beta));
+	float alphaRad = gradsToRads(alpha);
+	float betaRad = gradsToRads(beta);
+	float aux = (- g) * (2 * massAlpha + massBeta) * sin(alphaRad) - massBeta * g * sin(alphaRad + (- 2) * betaRad);
+	float aux2 = (- 2) * sin(alphaRad - betaRad) * massBeta * ((betaRad * betaRad) * lenghtBeta + (alphaRad * alphaRad) * lenghtAlpha * cos(alphaRad - betaRad));
+	float aux3 = lenghtAlpha * (2 * massAlpha + massBeta - massBeta * cos(2 * alphaRad - 2 * betaRad));
 	float result = (aux + aux2) / (aux3);
-	return result;
+	return radsToGrads(result);
 }
 
 float predictBeta() {
-	float aux = 2 * sin(alpha - beta) * ((alpha * alpha) * lenghtAlpha * (massAlpha + massBeta) 
-		+ g * (massAlpha + massBeta) * cos(alpha) +(beta * beta)*lenghtBeta*massBeta*cos(alpha - beta));
-	float aux2 = lenghtBeta * (2 * massAlpha + massBeta - massBeta * cos(2 * alpha - 2 * beta));
+	float alphaRad = gradsToRads(alpha);
+	float betaRad = gradsToRads(beta);
+	float aux = 2 * sin(alphaRad - betaRad) * ((alphaRad * alphaRad) * lenghtAlpha * (massAlpha + massBeta)
+		+ g * (massAlpha + massBeta) * cos(alphaRad) +(betaRad * betaRad)*lenghtBeta*massBeta*cos(alphaRad - betaRad));
+	float aux2 = lenghtBeta * (2 * massAlpha + massBeta - massBeta * cos(2 * alphaRad - 2 * betaRad));
 	float result = aux / aux2;
-	return result;
+	return radsToGrads(result);
 }
 
 void drawDoblePendulum() {
 	//pendulo principal
 	glPushMatrix();
-	glRotatef(alpha, 0.0f, 0.0f, -1.0f);
+	glRotatef(alpha, 0.0f, 0.0f, 1.0f);
 	glBegin(GL_LINES);
 	glColor3f(0.0f, 1.0f, 0.0f);
 	glVertex2f(0.0f, 0.0f);
-	glVertex2f(1.0f, 0.0f);
+	glVertex2f(0.0f, -1.0f);
 	glEnd();
 	glPushMatrix();
-	glTranslatef(1.0f, 0.0f, 0.0f);
-	glScalef(0.1, 0.1, 0.1);
+	glTranslatef(0.0f, -1.0f, 0.0f);
+	glScalef(0.1f, 0.1f, 0.1f);
 	glBegin(GL_POLYGON);
 	glColor3f(0.5f, 1.0f, 1.0f);
 	for (int i = 0; i < 360; i++) {
-		float x = cos(i * 3.14159 / 180.0);
-		float y = sin(i * 3.14159 / 180.0);
+		float x = cos(i * 3.14159f / 180.0f);
+		float y = sin(i * 3.14159f / 180.0f);
 		glVertex2f(x, y);
 	}
 	glEnd();
@@ -60,15 +73,15 @@ void drawDoblePendulum() {
 	glScalef(10.0f, 10.0f, 10.0f);
 	//péndulo secundario
 	glPushMatrix();
-	glRotatef(alpha, 0.0f, 0.0f, -1.0f);
+	glRotatef(beta - alpha, 0.0f, 0.0f, 1.0f);
 	glBegin(GL_LINES);
 	glColor3f(1.0f, 0.0f, 0.0f);
 	glVertex2f(0.0f, 0.0f);
-	glVertex2f(1.0f, 0.0f);
+	glVertex2f(0.0f, -1.0f);
 	glEnd();
 	glPushMatrix();
-	glTranslatef(1.0f, 0.0f, 0.0f);
-	glScalef(0.1, 0.1, 0.1);
+	glTranslatef(0.0f, -1.0f, 0.0f);
+	glScalef(0.1f, 0.1f, 0.1f);
 	glBegin(GL_POLYGON);
 	glColor3f(0.5f, 1.0f, 1.0f);
 	for (int i = 0; i < 360; i++) {
@@ -105,53 +118,31 @@ void reshape(int width, int height) {
 }
 
 void idle() {
-	//printf("%f", alpha);
-	//alpha += alphaIncrement;
-	//beta += betaIncrement;
-	// Si es mayor que dos pi la decrementamos
-	/*if (alpha > 180 || alpha < 0) {
-		alphaIncrement = -alphaIncrement;
-	}
-	if (beta > 180 || beta < 0) {
-		betaIncrement = -betaIncrement;
-	}*/
-	/*printf("Esto vale alpha %f    ------------    ", alpha);
-	float nextAlpha = predictAlpha();
-	int alphaInt = nextAlpha;
-	alphaInt = alphaInt % 360;
-
-	float nextBeta = predictBeta();
-	int betaInt = nextAlpha;
-	betaInt = betaInt % 360;
-	alpha = alphaInt;
-	beta = betaInt;
-	printf("Ahora vale %f   ||||||||", alpha);*/
-
-	//beta = nextBeta;
-	//glutPostRedisplay();
-	//glutSwapBuffers();
-}
-
-void timer(int iUnused) {
 	printf("Esto vale alpha %f    ------------    ", alpha);
 	float nextAlpha = predictAlpha();
 	float nextBeta = predictBeta();
+	while (nextAlpha >= 360) {
+		nextAlpha -= 360;
+	}
+	while (nextAlpha < 0) {
+		nextAlpha += 360;
+	}
+	while (nextBeta >= 360) {
+		nextBeta -= 360;
+	}
+	while (nextBeta < 0) {
+		nextBeta += 360;
+	}
+	//nextAlpha = (nextAlpha - alpha) / 10;
+	//nextBeta = (nextBeta - beta) / 10;
 	alpha = nextAlpha;
 	beta = nextBeta;
-	while (alpha >= 360) {
-		alpha -= 360;
-	}
-	while (alpha < 0) {
-		alpha += 360;
-	}
-	while (beta >= 360) {
-		beta -= 360;
-	}
-	while (beta < 0) {
-		beta += 360;
-	}
 	printf("Ahora vale %f   ||||||||", alpha);
 	glutPostRedisplay();
+}
+
+void timer(int iUnused) {
+	idle();
 	glutTimerFunc(300, timer, 0);
 }
 
@@ -171,7 +162,7 @@ int main(int argc, char** argv) {
 	// El color de fondo ser� el negro (RGBA, RGB + Alpha channel)
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glOrtho(-1.0, 1.0f, -1.0, 1.0f, -1.0, 1.0f);
-	timer(0);
+	//timer(0);
 	// Comienza la ejecuci�n del core de GLUT
 	glutMainLoop();
 	return 0;
