@@ -21,6 +21,7 @@ const float lenghtBeta = 1.0f;
 float velAlpha = 0.0f;
 float velBeta = 0.0f;
 const float dt = 0.1f;
+const float coefRoz = 0.1f;
 
 float gradsToRads(float grads) {
 	return (grads * pi) / 180;
@@ -43,10 +44,10 @@ float predictAccAlpha() {
 float predictAccBeta() {
 	float alphaRad = gradsToRads(alpha);
 	float betaRad = gradsToRads(beta);
-	float aux = (float)(2 * sin(alphaRad - betaRad) * ((velAlpha * velAlpha) * lenghtAlpha * (massAlpha + massBeta)
-		+ g * (massAlpha + massBeta) * cos(alphaRad) + (velBeta * velBeta) * lenghtBeta * massBeta * cos(alphaRad - betaRad)));
+	float aux = (float)(2 * sin(alphaRad - betaRad) * ((velAlpha * velAlpha) * lenghtAlpha * (massAlpha + massBeta) + g * (massAlpha + massBeta) * cos(alphaRad) + (velBeta * velBeta) * lenghtBeta * massBeta * cos(alphaRad - betaRad)));
 	float aux2 = (float)(lenghtBeta * (2 * massAlpha + massBeta - massBeta * cos(2 * alphaRad - 2 * betaRad)));
-	float accBeta = aux / aux2;
+	float aux3 = (float)((coefRoz / (massAlpha * lenghtAlpha * lenghtAlpha)) * velBeta);
+	float accBeta = (aux) / (aux2) - aux3;
 	return accBeta;
 }
 
@@ -57,10 +58,10 @@ void drawDoblePendulum() {
 	glBegin(GL_LINES);
 	glColor3f(0.0f, 1.0f, 0.0f);
 	glVertex2f(0.0f, 0.0f);
-	glVertex2f(0.0f, -1.0f);
+	glVertex2f(0.0f, -lenghtAlpha);
 	glEnd();
 	glPushMatrix();
-	glTranslatef(0.0f, -1.0f, 0.0f);
+	glTranslatef(0.0f, -lenghtAlpha, 0.0f);
 	glScalef(0.1f, 0.1f, 0.1f);
 	glBegin(GL_POLYGON);
 	glColor3f(0.5f, 1.0f, 1.0f);
@@ -78,10 +79,10 @@ void drawDoblePendulum() {
 	glBegin(GL_LINES);
 	glColor3f(1.0f, 0.0f, 0.0f);
 	glVertex2f(0.0f, 0.0f);
-	glVertex2f(0.0f, -1.0f);
+	glVertex2f(0.0f, -lenghtBeta);
 	glEnd();
 	glPushMatrix();
-	glTranslatef(0.0f, -1.0f, 0.0f);
+	glTranslatef(0.0f, -lenghtBeta, 0.0f);
 	glScalef(0.1f, 0.1f, 0.1f);
 	glBegin(GL_POLYGON);
 	glColor3f(0.5f, 1.0f, 1.0f);
@@ -136,7 +137,12 @@ void idle() {
 	alpha = radsToGrads(alphaRad);
 	beta = radsToGrads(betaRad);
 	//evitamos cualquier underflow y overflow
-	while (alpha >= 360) {
+	int alphaOverflow = (int)alpha / 360;
+	printf("AlphaOverflow vale %i", alphaOverflow);
+	alpha = (GLfloat)(alpha - 360 * alphaOverflow);
+	int betaOverflow = (int)beta / 360;
+	beta = (GLfloat)(beta - 360 * betaOverflow);
+	/*while (alpha >= 360) {
 		alpha -= 360;
 	}
 	while (alpha < 0) {
@@ -147,7 +153,7 @@ void idle() {
 	}
 	while (beta < 0) {
 		beta += 360;
-	}
+	}*/
 	//nextAlpha = (nextAlpha - alpha) / 10;
 	//nextBeta = (nextBeta - beta) / 10;
 	/*alpha = nextAlpha;
