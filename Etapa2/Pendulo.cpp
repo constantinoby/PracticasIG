@@ -10,19 +10,17 @@ const int W_WIDTH = 500; // Tama�o incial de la ventana
 const int W_HEIGHT = 500;
 
 const float g = 9.8f;
-const float pi = 3.1415f;
+const float pi = 3.14159265358979323846f;
 
 GLfloat alpha = 28.64f;
 GLfloat beta = 57.29f;
-float massAlpha = 1.0f;
-float massBeta = 2.0f;
-float lenghtAlpha = 1.0f;
-float lenghtBeta = 1.0f;
+const float massAlpha = 1.0f;
+const float massBeta = 2.0f;
+const float lenghtAlpha = 1.0f;
+const float lenghtBeta = 1.0f;
 float velAlpha = 0.0f;
 float velBeta = 0.0f;
-float dt = 0.1f;
-float alphaIncrement = 0.03f;
-float betaIncrement = 0.03f;
+const float dt = 0.1f;
 
 float gradsToRads(float grads) {
 	return (grads * pi) / 180;
@@ -35,19 +33,19 @@ float radsToGrads(float rads) {
 float predictAccAlpha() {
 	float alphaRad = gradsToRads(alpha);
 	float betaRad = gradsToRads(beta);
-	float aux = (- g) * (2 * massAlpha + massBeta) * sin(alphaRad) - massBeta * g * sin(alphaRad + (- 2) * betaRad);
-	float aux2 = (- 2) * sin(alphaRad - betaRad) * massBeta * ((velBeta * velBeta) * lenghtBeta + (velAlpha * velAlpha) * lenghtAlpha * cos(alphaRad - betaRad));
-	float aux3 = lenghtAlpha * (2 * massAlpha + massBeta - massBeta * cos(2 * alphaRad - 2 * betaRad));
-	float accAlpha = (aux + aux2) / (aux3);
+	float aux = (float)((- g) * (2 * massAlpha + massBeta) * sin(alphaRad) - massBeta * g * sin(alphaRad + (- 2) * betaRad));
+	float aux2 = (float)((- 2) * sin(alphaRad - betaRad) * massBeta * ((velBeta * velBeta) * lenghtBeta + (velAlpha * velAlpha) * lenghtAlpha * cos(alphaRad - betaRad)));
+	float aux3 = (float)(lenghtAlpha * (2 * massAlpha + massBeta - massBeta * cos(2 * alphaRad - 2 * betaRad)));
+	float accAlpha = (float)((aux + aux2) / (aux3));
 	return accAlpha;
 }
 
 float predictAccBeta() {
 	float alphaRad = gradsToRads(alpha);
 	float betaRad = gradsToRads(beta);
-	float aux = 2 * sin(alphaRad - betaRad) * ((velAlpha * velAlpha) * lenghtAlpha * (massAlpha + massBeta)
-		+ g * (massAlpha + massBeta) * cos(alphaRad) + (velBeta * velBeta) * lenghtBeta * massBeta * cos(alphaRad - betaRad));
-	float aux2 = lenghtBeta * (2 * massAlpha + massBeta - massBeta * cos(2 * alphaRad - 2 * betaRad));
+	float aux = (float)(2 * sin(alphaRad - betaRad) * ((velAlpha * velAlpha) * lenghtAlpha * (massAlpha + massBeta)
+		+ g * (massAlpha + massBeta) * cos(alphaRad) + (velBeta * velBeta) * lenghtBeta * massBeta * cos(alphaRad - betaRad)));
+	float aux2 = (float)(lenghtBeta * (2 * massAlpha + massBeta - massBeta * cos(2 * alphaRad - 2 * betaRad)));
 	float accBeta = aux / aux2;
 	return accBeta;
 }
@@ -67,8 +65,8 @@ void drawDoblePendulum() {
 	glBegin(GL_POLYGON);
 	glColor3f(0.5f, 1.0f, 1.0f);
 	for (int i = 0; i < 360; i++) {
-		float x = cos(i * 3.14159f / 180.0f);
-		float y = sin(i * 3.14159f / 180.0f);
+		float x = (float)cos(i * 3.14159f / 180.0f);
+		float y = (float)sin(i * 3.14159f / 180.0f);
 		glVertex2f(x, y);
 	}
 	glEnd();
@@ -88,8 +86,8 @@ void drawDoblePendulum() {
 	glBegin(GL_POLYGON);
 	glColor3f(0.5f, 1.0f, 1.0f);
 	for (int i = 0; i < 360; i++) {
-		float x = cos(i * 3.14159 / 180.0);
-		float y = sin(i * 3.14159 / 180.0);
+		float x = (float)cos(i * 3.14159 / 180.0);
+		float y = (float)sin(i * 3.14159 / 180.0);
 		glVertex2f(x, y);
 	}
 	glEnd();
