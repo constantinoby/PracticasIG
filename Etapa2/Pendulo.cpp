@@ -13,7 +13,7 @@ const float g = 9.8f;
 const float pi = 3.14159265358979323846f;
 
 GLfloat alpha = 28.64f;
-GLfloat beta = 57.29f;
+GLfloat beta = 90.0f;
 const float massAlpha = 1.0f;
 const float massBeta = 2.0f;
 const float lenghtAlpha = 1.0f;
@@ -50,6 +50,20 @@ float predictAccBeta() {
 	float accBeta = (aux) / (aux2) - aux3;
 	return accBeta;
 }
+
+//float predictAccAlpha() {
+//	float alphaRad = gradsToRads(alpha);
+//	float betaRad = gradsToRads(beta);
+//	float accAlpha = (float)((-g * (2 * massAlpha + massBeta) * sin(alphaRad) - massBeta * g * sin(alphaRad - 2 * betaRad) - 2 * sin(alphaRad - betaRad) * massBeta * (velBeta * velBeta * lenghtBeta + velAlpha * velAlpha * lenghtAlpha * cos(alphaRad - betaRad))) / (lenghtAlpha * (2 * massAlpha + massBeta - massBeta * cos(2 * alphaRad - 2 * betaRad))));
+//	return accAlpha;
+//}
+//
+//float predictAccBeta() {
+//	float alphaRad = gradsToRads(alpha);
+//	float betaRad = gradsToRads(beta);
+//	float accBeta = (float)((2 * sin(alphaRad - betaRad) * (velAlpha * velAlpha * lenghtAlpha * (massAlpha + massBeta) + g * (massAlpha + massBeta) * cos(alphaRad) + velBeta * velBeta * lenghtBeta * massBeta * cos(alphaRad - betaRad))) / (lenghtBeta * (2 * massAlpha + massBeta - massBeta * cos(2 * alphaRad - 2 * betaRad))) - (coefRoz / (alphaRad * lenghtAlpha * lenghtAlpha)) * velBeta);
+//	return accBeta;
+//}
 
 void drawDoblePendulum() {
 	//pendulo principal
@@ -124,9 +138,33 @@ void idle() {
 	//Calculamos las aceleraciones angulares
 	float accAlpha = predictAccAlpha();
 	float accBeta = predictAccBeta();
+	if (accAlpha > 8) {
+		accAlpha = 8;
+	}
+	else if (accAlpha < -8) {
+		accAlpha = -8;
+	}
+	if (accBeta > 8) {
+		accBeta = 8;
+	}
+	else if (accBeta < -8) {
+		accBeta = -8;
+	}
+	printf("***** Esto vale la aceleración alpha: %f", accAlpha);
 	//Actualizamos las velocidades angulares
 	velAlpha = velAlpha + accAlpha * dt;
 	velBeta = velBeta + accBeta * dt;
+	//Control de la velocidad
+	if (velAlpha > 10) {
+		velAlpha = 10;
+	} else if (velAlpha < -10) {
+		velAlpha = -10;
+	}
+	if (velBeta > 10) {
+		velBeta = 10;
+	} else if (velBeta < -10) {
+		velBeta = -10;
+	}
 	//Pasamos los grados de los angulos usados a radianes para actualizarlos
 	float alphaRad = gradsToRads(alpha);
 	float betaRad = gradsToRads(beta);
@@ -158,7 +196,8 @@ void idle() {
 	//nextBeta = (nextBeta - beta) / 10;
 	/*alpha = nextAlpha;
 	beta = nextBeta;*/
-	printf("Ahora vale %f   ||||||||", alpha);
+
+	printf("Y esto vale la velocidad lineal %f   \n ||||||||", velAlpha);
 	glutPostRedisplay();
 }
 
@@ -181,7 +220,7 @@ int main(int argc, char** argv) {
 	//glutIdleFunc(idle);
 	glutReshapeFunc(reshape);
 	// El color de fondo ser� el negro (RGBA, RGB + Alpha channel)
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glOrtho(-1.0, 1.0f, -1.0, 1.0f, -1.0, 1.0f);
 	timer(0);
 	// Comienza la ejecuci�n del core de GLUT
