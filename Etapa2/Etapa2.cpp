@@ -95,6 +95,7 @@ void figura2() {
 	glVertex3f(-0.5f, 0.2f, 0.0f);
 	glEnd();
 
+
 	glPopMatrix();
 }
 

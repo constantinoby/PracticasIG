@@ -14,8 +14,7 @@ void sol() {
 	glScalef(0.75, 0.75, 0.75);
 	glBegin(GL_POLYGON);
 	glColor3f(1.0f, 0.5f, 0.0f);
-	for (int i = 0; i < 360; i++)
-	{
+	for (int i = 0; i < 360; i++){
 		float x = cos(i * 3.14159 / 180.0);
 		float y = sin(i * 3.14159 / 180.0);
 		glVertex2f(x, y);
@@ -33,20 +32,20 @@ void planeta1() {
 	glScalef(0.3, 0.3, 0.3);
 	glBegin(GL_POLYGON);
 	glColor3f(0.5f, 1.0f, 1.0f);
-	for (int i = 0; i < 360; i++)
-	{
+	for (int i = 0; i < 360; i++){
 		float x = cos(i * 3.14159 / 180.0);
 		float y = sin(i * 3.14159 / 180.0);
 		glVertex2f(x, y);
 	}
 	glEnd();
+	
 
 	glPopMatrix();
 }
 
 void planeta2() {
 	glPushMatrix();
-
+	
 	glRotatef(2*fAngulo, 0.0f, 0.0f, 1.0f);
 	glTranslatef(-1.4, 0.0f, 0.0f);
 	glScalef(0.25, 0.25, 0.25);
@@ -60,6 +59,7 @@ void planeta2() {
 	}
 	glEnd();
 
+	//planeta1();
 	glPopMatrix();
 }
 
@@ -71,8 +71,7 @@ void planeta3() {
 	glScalef(0.2, 0.2, 0.2);
 	glBegin(GL_POLYGON);
 	glColor3f(0.0f, 1.0f, 0.0f);
-	for (int i = 0; i < 360; i++)
-	{
+	for (int i = 0; i < 360; i++){
 		float x = cos(i * 3.14159 / 180.0);
 		float y = sin(i * 3.14159 / 180.0);
 		glVertex2f(x, y);
@@ -90,8 +89,7 @@ void planeta4() {
 	glScalef(0.1, 0.1, 0.1);
 	glBegin(GL_POLYGON);
 	glColor3f(0.0f, 0.1f, 0.1f);
-	for (int i = 0; i < 360; i++)
-	{
+	for (int i = 0; i < 360; i++){
 		float x = cos(i * 3.14159 / 180.0);
 		float y = sin(i * 3.14159 / 180.0);
 		glVertex2f(x, y);
