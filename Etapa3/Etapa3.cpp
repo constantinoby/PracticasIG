@@ -8,6 +8,7 @@ const int W_WIDTH = 600; // Tama�o incial de la ventana
 const int W_HEIGHT = 600;
 GLfloat fAngulo; // Variable que indica el �ngulo de rotaci�n de los ejes. 
 int figura = 0;
+bool ejes=true;
 
 void DrawAxes()
 {
@@ -44,7 +45,10 @@ void Display(void)
 {
 	// Borramos la escena
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	DrawAxes();
+
+	if (ejes) {
+		DrawAxes();
+	}
 
 
 	switch (figura) {
@@ -64,7 +68,19 @@ void Display(void)
 		glPopMatrix();
 		break;
 	case 3:
-		//DrawAxes();
+		glPushMatrix();
+		glRotatef(fAngulo, 0.0f, 0.0f, 1.0f);
+		glColor3f(1.0f, 0.5f, 0.0f);
+		glScalef(5.0f, 5.0f, 5.0f);
+		glutWireTetrahedron(); 
+		glPopMatrix();
+		break;
+	case 4:
+		glPushMatrix();
+		glRotatef(fAngulo, 0.0f, 0.0f, 1.0f);
+		glColor4f(1.0f, 0.0f, 1.0f, 0.0f);
+		glutWireCube(5);// Dibuja un cubo con un tamaño de 5
+		glPopMatrix();
 		break;
 	default:
 		break;
@@ -108,29 +124,17 @@ void teclas(unsigned char key, int x, int y) {
 	case '3':
 		figura = 3;
 		break;
+	case '4':
+		figura = 4;
+		break;
+	case 'e':
+		ejes = !ejes;
+		break;
 	default:
 		figura = 0;
 		break;
 	}
 
-	//switch (key) {
-	//case 'q': // 
-	//	printf("UN");
-	//	glPushMatrix();
-	//	glRotatef(fAngulo, 0.0f, 0.0f, 1.0f);
-	//	glColor3f(0.5, 0.5, 0.5);
-	//	glutWireTeapot(5); // Dibuja un teapot sólido con un radio de 0.5 unidades
-	//	glPopMatrix();
-	//	break;
-
-	//case '2':
-	//	printf("DOS");
-		//glPushMatrix();
-		//glRotatef(fAngulo, 0.0f, 0.0f, 1.0f);
-		//glColor3f(0.5, 0.5, 0.5);
-		//glutWireCone(5,5,5,5); // Dibuja un teapot sólido con un radio de 0.5 unidades
-		//glPopMatrix();
-	//}
 }
 
 
@@ -161,7 +165,7 @@ int main(int argc, char** argv)
 
 
 	// Creamos la nueva ventana
-	glutCreateWindow("Mi Sistema Solar");
+	glutCreateWindow("Etapa 3");
 
 	// Indicamos cuales son las funciones de redibujado e idle
 	glutDisplayFunc(Display);
