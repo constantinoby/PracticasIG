@@ -18,9 +18,6 @@
     <ClCompile Include="Etapa2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Pendulo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

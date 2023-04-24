@@ -128,7 +128,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Etapa2.cpp" />
-    <ClCompile Include="Pendulo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
