@@ -4,6 +4,7 @@
 #include <GL/glut.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include <stdio.h>
 const int W_WIDTH = 500; // Tama�o incial de la ventana
 const int W_HEIGHT = 500;
 GLfloat fAngulo; // Variable que indica el �ngulo de rotaci�n de los ejes. 
@@ -36,6 +37,7 @@ void Display(void)
 	glVertex3f(-0.5f, -0.866f, 0.0f);
 	glEnd();
 
+
 	glBegin(GL_POLYGON);
 	glColor3f(1.0f, 1.0f, 1.0f);
 	glVertex3f(0.0f, 0.0f, 0.0f);
@@ -44,24 +46,38 @@ void Display(void)
 	glColor3f(0.0f, 0.0f, 1.0f);
 	glVertex3f(-0.5f, -0.866f, 0.0f);
 	glEnd();
+
+
+	//Dibujar un cuadrado en medio de la pantalla
+	glBegin(GL_POLYGON);
+
+	//glColor3f(1.0, 0.0, 1.0); // color de la cara o tapa
+	glColor4f(1.0f, 0.5f, 0.0f, 0.0f);
+	glVertex3f(0.25, -0.25, 0.25);
+	glVertex3f(0.25, 0.25, 0.25);
+	glVertex3f(-0.25, 0.25, 0.25);
+	glVertex3f(-0.25, -0.25, 0.25);
+
+	glEnd();
+
 	glPopMatrix();
 
 	glFlush();
+	glutSwapBuffers();
 }
 
 // Función que se ejecuta cuando se redimensiona la ventana
 void reshape(int width, int height) {
-	glViewport(0, 0, width, height);
+	//un print de width y height para ver que valores se reciben
+	printf(" Etapa 1 = width: %d, height: %d\n", width, height);
+	
+	glViewport(0, 0, (GLsizei)width, (GLsizei)height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	double aspect = (double)width / (double)height;
-	if (aspect > 1.0) {
-		glOrtho(-aspect, aspect, -1.0, 1.0, -1.0, 1.0);
-	}
-	else {
-		glOrtho(-1.0, 1.0, -1.0 / aspect, 1.0 / aspect, -1.0, 1.0);
-	}
+	gluPerspective(60.0, (GLfloat)width/ (GLfloat) height,1.0,20.0);
 	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	gluLookAt(0.0,0.0,5.0,0.0,0.0,0.0,0.0,1.0,0.0);
 }
 
 
@@ -71,13 +87,12 @@ void reshape(int width, int height) {
 void Idle(void)
 {
 	// Incrementamos el �ngulo
-	fAngulo += 0.3f;
+	fAngulo += 0.03f;
 	// Si es mayor que dos pi la decrementamos
 	if (fAngulo > 360)
 		fAngulo -= 360;
 	// Indicamos que es necesario repintar la pantalla
 	glutPostRedisplay();
-	glutSwapBuffers();
 
 }
 
