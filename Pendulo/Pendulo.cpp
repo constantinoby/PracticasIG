@@ -65,6 +65,24 @@ float predictAccBeta() {
 //	return accBeta;
 //}
 
+void lineas() {
+	glPushMatrix();
+	// Creamos a las 2 lineas que forman los ejes
+	glBegin(GL_LINES);
+	glColor3f(0.0f, 1.0f, 0.0f);
+	glVertex2f(0.0f, W_WIDTH);
+	glVertex2f(0.0f, -W_WIDTH);
+	glEnd();
+
+	glBegin(GL_LINES);
+	glColor4f(1.0f, 0.0f, 0.0f, 0.0f);
+	glVertex2f(W_HEIGHT, 0.0f);
+	glVertex2f(-W_HEIGHT, 0.0f);
+	glEnd();
+
+	glPopMatrix();
+}
+
 void drawDoblePendulum() {
 	//pendulo principal
 	glPushMatrix();
@@ -116,6 +134,8 @@ void drawDoblePendulum() {
 
 void display() {
 	glClear(GL_COLOR_BUFFER_BIT);
+	lineas();
+
 	drawDoblePendulum();
 	glutSwapBuffers();
 }
