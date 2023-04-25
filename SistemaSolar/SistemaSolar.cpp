@@ -6,7 +6,8 @@
 
 const int W_WIDTH = 600; // Tama�o incial de la ventana
 const int W_HEIGHT = 600;
-GLfloat fAngulo; // Variable que indica el �ngulo de rotaci�n de los ejes. 
+GLfloat fAngulo; // Variable que indica el �ngulo de rotaci�n de los ejes.
+bool ejes = true;
 
 
 void lineas() {
@@ -123,7 +124,9 @@ void Display(void)
 	// Borramos la escena
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	lineas();
+	if (ejes) {
+		lineas();
+	}
 
 	sol();
 
@@ -152,6 +155,19 @@ void reshape(int width, int height) {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	gluLookAt(0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+}
+
+void teclas(unsigned char key, int x, int y) {
+
+
+	switch (key) {
+	case 'e':
+		ejes = !ejes;
+		break;
+	default:
+		break;
+	}
+
 }
 
 
@@ -189,6 +205,7 @@ int main(int argc, char** argv)
 	glutIdleFunc(Idle);
 
 	glutReshapeFunc(reshape);
+	glutKeyboardFunc(teclas);
 
 
 
