@@ -13,7 +13,7 @@ bool ejes=true;
 void DrawAxes()
 {
 	glPushMatrix();
-	glRotatef(fAngulo, 0.0f, 0.0f, 1.0f);
+	//glRotatef(fAngulo, 0.0f, 0.0f, 1.0f);
 	// Eje X
 	glColor3f(1.0f, 0.0f, 0.0f); // Color rojo
 	glBegin(GL_LINES);
@@ -44,6 +44,7 @@ void DrawAxes()
 void Display(void)
 {
 	// Borramos la escena
+	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	if (ejes) {
@@ -55,7 +56,7 @@ void Display(void)
 	case 1:
 
 		glPushMatrix();
-		glRotatef(fAngulo, 0.0f, 0.0f, 1.0f);
+		glRotatef(fAngulo, 0.0f, 1.0f, 0.0f);
 		glColor3f(0.5, 0.5, 0.5);
 		glutWireTeapot(5); // Dibuja un teapot sólido con un radio de 0.5 unidades
 		glPopMatrix();
@@ -103,12 +104,23 @@ void reshape(int width, int height) {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	// Reemplazamos gluPerspective por glFrustum
-	glFrustum(-1.0, 1.0, -1.0, 1.0, 1.0, 20.0);
+	int ratio=width/height;
+
+	if (ratio >= 1.0) {
+		//glOrtho(-1.0 * ratio, 1.0f * ratio, -1.0, 1.0f, -1.0, 1.0f);
+		glFrustum(-1.0 * ratio, 1.0f * ratio, -1.0, 1.0f, 1.0f, 500.0f);
+	}
+	else {
+		//glOrtho(-1.0, 1.0f, -1.0 / ratio, 1.0f / ratio, -1.0, 1.0f);
+		glFrustum(-1.0, 1.0f, -1.0/ratio, 1.0f/ratio, 1.0f, 500.0f);
+	}
+
+	// Reemplazamos por glFrustum
+	//glFrustum(-1.0, 1.0, -1.0, 1.0, 1.0, 20.0);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	gluLookAt(0.0, 5.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+	gluLookAt(5.0, 5.0, 15.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 }
 
 void teclas(unsigned char key, int x, int y) {
