@@ -9,11 +9,12 @@ const int W_HEIGHT = 600;
 GLfloat fAngulo; // Variable que indica el �ngulo de rotaci�n de los ejes. 
 int figura = 0;
 bool ejes=true;
+bool planes = false;
+bool solid=false;
 
 void DrawAxes()
 {
 	glPushMatrix();
-	//glRotatef(fAngulo, 0.0f, 0.0f, 1.0f);
 	// Eje X
 	glColor3f(1.0f, 0.0f, 0.0f); // Color rojo
 	glBegin(GL_LINES);
@@ -38,6 +39,36 @@ void DrawAxes()
 	glPopMatrix();
 }
 
+void DrawPlanes()
+{
+	// Dibujar plano XY
+	glColor3f(1.0f, 0.0f, 0.0f); // Rojo
+	glBegin(GL_QUADS);
+	glVertex3f(-10.0f, -10.0f, 0.0f);
+	glVertex3f(10.0f, -10.0f, 0.0f);
+	glVertex3f(10.0f, 10.0f, 0.0f);
+	glVertex3f(-10.0f, 10.0f, 0.0f);
+	glEnd();
+
+	// Dibujar plano XZ
+	glColor3f(0.0f, 1.0f, 0.0f); // Verde
+	glBegin(GL_QUADS);
+	glVertex3f(-10.0f, 0.0f, -10.0f);
+	glVertex3f(10.0f, 0.0f, -10.0f);
+	glVertex3f(10.0f, 0.0f, 10.0f);
+	glVertex3f(-10.0f, 0.0f, 10.0f);
+	glEnd();
+
+	// Dibujar plano YZ
+	glColor3f(0.0f, 0.0f, 1.0f); // Azul
+	glBegin(GL_QUADS);
+	glVertex3f(0.0f, -10.0f, -10.0f);
+	glVertex3f(0.0f, 10.0f, -10.0f);
+	glVertex3f(0.0f, 10.0f, 10.0f);
+	glVertex3f(0.0f, -10.0f, 10.0f);
+	glEnd();
+}
+
 
 
 
@@ -51,6 +82,12 @@ void Display(void)
 		DrawAxes();
 	}
 
+	if (planes) {
+		DrawPlanes();
+
+	}
+
+
 
 	switch (figura) {
 	case 1:
@@ -58,14 +95,22 @@ void Display(void)
 		glPushMatrix();
 		glRotatef(fAngulo, 0.0f, 1.0f, 0.0f);
 		glColor3f(0.5, 0.5, 0.5);
-		glutWireTeapot(5); // Dibuja un teapot sólido con un radio de 0.5 unidades
+		if (solid) {
+			glutSolidTeapot(5);
+		}else {
+			glutWireTeapot(5); // Dibuja un teapot sólido con un radio de 0.5 unidades
+		}
 		glPopMatrix();
 		break;
 	case 2:
 		glPushMatrix();
 		glRotatef(fAngulo, 0.0f, 0.0f, 1.0f);
 		glColor3f(0.5, 0.5, 0.5);
-		glutWireCone(5, 5, 5, 5); // Dibuja un teapot sólido con un radio de 0.5 unidades
+		if (solid) {
+			glutSolidCone(5, 5, 5, 5);
+		}else {
+			glutWireCone(5, 5, 5, 5); // Dibuja un teapot sólido con un radio de 0.5 unidades
+		}
 		glPopMatrix();
 		break;
 	case 3:
@@ -73,14 +118,22 @@ void Display(void)
 		glRotatef(fAngulo, 0.0f, 0.0f, 1.0f);
 		glColor3f(1.0f, 0.5f, 0.0f);
 		glScalef(5.0f, 5.0f, 5.0f);
-		glutWireTetrahedron(); 
+		if (solid) {
+			glutSolidTetrahedron();
+		}else {
+			glutWireTetrahedron();
+		}
 		glPopMatrix();
 		break;
 	case 4:
 		glPushMatrix();
 		glRotatef(fAngulo, 0.0f, 0.0f, 1.0f);
 		glColor4f(1.0f, 0.0f, 1.0f, 0.0f);
-		glutWireCube(5);// Dibuja un cubo con un tamaño de 5
+		if (solid) {
+			glutSolidCube(5);
+		}else {
+			glutWireCube(5);// Dibuja un cubo con un tamaño de 5
+		}
 		glPopMatrix();
 		break;
 	default:
@@ -115,9 +168,6 @@ void reshape(int width, int height) {
 		glFrustum(-1.0, 1.0f, -1.0/ratio, 1.0f/ratio, 1.0f, 500.0f);
 	}
 
-	// Reemplazamos por glFrustum
-	//glFrustum(-1.0, 1.0, -1.0, 1.0, 1.0, 20.0);
-
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	gluLookAt(5.0, 5.0, 15.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
@@ -141,6 +191,12 @@ void teclas(unsigned char key, int x, int y) {
 		break;
 	case 'e':
 		ejes = !ejes;
+		break;
+	case 'p':
+		planes = !planes;
+		break;
+	case 's':
+		solid = !solid;
 		break;
 	default:
 		figura = 0;
