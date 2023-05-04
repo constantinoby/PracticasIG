@@ -61,7 +61,7 @@ void drawPlanes() {
 	glVertex3f(size, 0.0f, size);
 	glEnd();
 
-	// Plano Y -Z
+	// Plano Y - Z
 	glColor3f(0.0f, 0.0f, 1.0f); // Color azul
 	glBegin(GL_QUADS);
 	glVertex3f(0.0f, -size, size);
