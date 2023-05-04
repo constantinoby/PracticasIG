@@ -12,7 +12,7 @@ bool ejes=true;
 bool solid = false;
 bool planes = false;
 
-void DrawAxes() {
+void drawAxes() {
 	glPushMatrix();
 	//glRotatef(fAngulo, 0.0f, 0.0f, 1.0f);
 	// Eje X
@@ -68,16 +68,17 @@ void drawPlanes() {
 	glVertex3f(0.0f, -size, -size);
 	glVertex3f(0.0f, size, -size);
 	glVertex3f(0.0f, size, size);
+	glEnd();
 	glPopMatrix();
 }
 
-void Display(void) {
+void display(void) {
 	// Borramos la escena
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	if (ejes) {
-		DrawAxes();
+		drawAxes();
 	}
 
 	if (planes) {
@@ -91,8 +92,7 @@ void Display(void) {
 		glColor3f(0.5, 0.5, 0.5);
 		if (solid) {
 			glutSolidTeapot(5); // Dibuja un teapot sólido con un radio de 0.5 unidades
-		}
-		else {
+		} else {
 			glutWireTeapot(5); // Dibuja un teapot delineado con un radio de 0.5 unidades
 		}
 		glPopMatrix();
@@ -103,8 +103,7 @@ void Display(void) {
 		glColor3f(0.5, 0.5, 0.5);
 		if (solid) {
 			glutSolidCone(5, 5, 5, 5); // Dibuja un teapot sólido con un radio de 0.5 unidades
-		}
-		else {
+		} else {
 			glutWireCone(5, 5, 5, 5); // Dibuja un teapot sólido con un radio de 0.5 unidades
 		}
 		glPopMatrix();
@@ -116,8 +115,7 @@ void Display(void) {
 		glScalef(5.0f, 5.0f, 5.0f);
 		if (solid) {
 			glutSolidTetrahedron();
-		}
-		else {
+		} else {
 			glutWireTetrahedron();
 		}
 		glPopMatrix();
@@ -128,8 +126,7 @@ void Display(void) {
 		glColor4f(1.0f, 0.0f, 1.0f, 0.0f);
 		if (solid) {
 			glutSolidCube(5);// Dibuja un cubo con un tamaño de 5
-		}
-		else {
+		} else {
 			glutWireCube(5);// Dibuja un cubo con un tamaño de 5
 		}
 		glPopMatrix();
@@ -156,10 +153,10 @@ void reshape(int width, int height) {
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	gluLookAt(5.0, 5.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+	gluLookAt(5.0, 5.0, 15.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 }
 
-void teclas(unsigned char key, int x, int y) {
+void userInput(unsigned char key, int x, int y) {
 	switch (key) {
 		case '1':
 			figura = 1;
@@ -189,8 +186,7 @@ void teclas(unsigned char key, int x, int y) {
 }
 
 // Funci�n que se ejecuta cuando el sistema no esta ocupado
-void Idle(void)
-{
+void idle(void) {
 	// Incrementamos el �ngulo
 	fAngulo += 0.03f;
 	// Si es mayor que dos pi la decrementamos
@@ -215,10 +211,10 @@ int main(int argc, char** argv) {
 	glutCreateWindow("Etapa 3");
 
 	// Indicamos cuales son las funciones de redibujado e idle
-	glutDisplayFunc(Display);
-	glutIdleFunc(Idle);
+	glutDisplayFunc(display);
+	glutIdleFunc(idle);
 	glutReshapeFunc(reshape);
-	glutKeyboardFunc(teclas);
+	glutKeyboardFunc(userInput);
 
 	// El color de fondo ser� el negro (RGBA, RGB + Alpha channel)
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
