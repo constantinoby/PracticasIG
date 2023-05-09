@@ -8,6 +8,7 @@
 #include <math.h>
 const int W_WIDTH = 500; // Tama�o incial de la ventana
 const int W_HEIGHT = 500;
+bool ejes = true;
 
 const float g = 9.8f;
 const float pi = 3.14159265358979323846f;
@@ -65,6 +66,24 @@ float predictAccBeta() {
 //	return accBeta;
 //}
 
+void lineas() {
+	glPushMatrix();
+	// Creamos a las 2 lineas que forman los ejes
+	glBegin(GL_LINES);
+	glColor3f(0.0f, 0.0f, 1.0f);
+	glVertex2f(0.0f, W_WIDTH);
+	glVertex2f(0.0f, -W_WIDTH);
+	glEnd();
+
+	glBegin(GL_LINES);
+	glColor4f(1.0f, 0.0f, 0.0f, 0.0f);
+	glVertex2f(W_HEIGHT, 0.0f);
+	glVertex2f(-W_HEIGHT, 0.0f);
+	glEnd();
+
+	glPopMatrix();
+}
+
 void drawDoblePendulum() {
 	//pendulo principal
 	glPushMatrix();
@@ -116,6 +135,10 @@ void drawDoblePendulum() {
 
 void display() {
 	glClear(GL_COLOR_BUFFER_BIT);
+	if (ejes) {
+		lineas();
+	}
+
 	drawDoblePendulum();
 	glutSwapBuffers();
 }
@@ -131,6 +154,18 @@ void reshape(int width, int height) {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	gluLookAt(0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+}
+void teclas(unsigned char key, int x, int y) {
+
+
+	switch (key) {
+	case 'e':
+		ejes = !ejes;
+		break;
+	default:
+		break;
+	}
+
 }
 
 void idle() {
@@ -221,6 +256,7 @@ int main(int argc, char** argv) {
 	glutDisplayFunc(display);
 	//glutIdleFunc(idle);
 	glutReshapeFunc(reshape);
+	glutKeyboardFunc(teclas);
 	// El color de fondo ser� el negro (RGBA, RGB + Alpha channel)
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glOrtho(-1.0, 1.0f, -1.0, 1.0f, -1.0, 1.0f);

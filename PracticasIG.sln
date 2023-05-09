@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SistemaSolar", "SistemaSola
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Pendulo", "Pendulo\Pendulo.vcxproj", "{7606891C-479D-4F6A-BF0C-428033636FEF}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Etapa3", "Etapa3\Etapa3.vcxproj", "{24655DB7-90D0-4093-9A46-4741476E444E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -51,6 +53,14 @@ Global
 		{7606891C-479D-4F6A-BF0C-428033636FEF}.Release|x64.Build.0 = Release|x64
 		{7606891C-479D-4F6A-BF0C-428033636FEF}.Release|x86.ActiveCfg = Release|Win32
 		{7606891C-479D-4F6A-BF0C-428033636FEF}.Release|x86.Build.0 = Release|Win32
+		{24655DB7-90D0-4093-9A46-4741476E444E}.Debug|x64.ActiveCfg = Debug|x64
+		{24655DB7-90D0-4093-9A46-4741476E444E}.Debug|x64.Build.0 = Debug|x64
+		{24655DB7-90D0-4093-9A46-4741476E444E}.Debug|x86.ActiveCfg = Debug|Win32
+		{24655DB7-90D0-4093-9A46-4741476E444E}.Debug|x86.Build.0 = Debug|Win32
+		{24655DB7-90D0-4093-9A46-4741476E444E}.Release|x64.ActiveCfg = Release|x64
+		{24655DB7-90D0-4093-9A46-4741476E444E}.Release|x64.Build.0 = Release|x64
+		{24655DB7-90D0-4093-9A46-4741476E444E}.Release|x86.ActiveCfg = Release|Win32
+		{24655DB7-90D0-4093-9A46-4741476E444E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

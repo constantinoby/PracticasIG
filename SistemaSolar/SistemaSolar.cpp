@@ -6,7 +6,27 @@
 
 const int W_WIDTH = 600; // Tama�o incial de la ventana
 const int W_HEIGHT = 600;
-GLfloat fAngulo; // Variable que indica el �ngulo de rotaci�n de los ejes. 
+GLfloat fAngulo; // Variable que indica el �ngulo de rotaci�n de los ejes.
+bool ejes = true;
+
+
+void lineas() {
+	glPushMatrix();
+	// Creamos a las 2 lineas que forman los ejes
+	glBegin(GL_LINES);
+	glColor3f(0.0f, 1.0f, 0.0f);
+	glVertex2f(0.0f, W_WIDTH);
+	glVertex2f(0.0f, -W_WIDTH);
+	glEnd();
+
+	glBegin(GL_LINES);
+	glColor4f(1.0f, 0.0f, 0.0f, 0.0f);
+	glVertex2f(W_HEIGHT, 0.0f);
+	glVertex2f(-W_HEIGHT, 0.0f);
+	glEnd();
+
+	glPopMatrix();
+}
 
 void sol() {
 	glPushMatrix();
@@ -104,6 +124,9 @@ void Display(void)
 	// Borramos la escena
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	if (ejes) {
+		lineas();
+	}
 
 	sol();
 
@@ -132,6 +155,19 @@ void reshape(int width, int height) {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	gluLookAt(0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+}
+
+void teclas(unsigned char key, int x, int y) {
+
+
+	switch (key) {
+	case 'e':
+		ejes = !ejes;
+		break;
+	default:
+		break;
+	}
+
 }
 
 
@@ -169,6 +205,7 @@ int main(int argc, char** argv)
 	glutIdleFunc(Idle);
 
 	glutReshapeFunc(reshape);
+	glutKeyboardFunc(teclas);
 
 
 
