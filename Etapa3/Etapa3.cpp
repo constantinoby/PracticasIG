@@ -9,11 +9,11 @@ const int W_HEIGHT = 600;
 GLfloat fAngulo; // Variable que indica el �ngulo de rotaci�n de los ejes. 
 int figura = 0;
 bool ejes=true;
+bool solid = false;
+bool planes = false;
 
-void DrawAxes()
-{
+void drawAxes() {
 	glPushMatrix();
-	glRotatef(fAngulo, 0.0f, 0.0f, 1.0f);
 	// Eje X
 	glColor3f(1.0f, 0.0f, 0.0f); // Color rojo
 	glBegin(GL_LINES);
@@ -38,33 +38,73 @@ void DrawAxes()
 	glPopMatrix();
 }
 
+void drawPlanes() {
+	float size = 10.0f;
+	glPushMatrix();
+	//glRotatef(fAngulo, 0.0f, 0.0f, 1.0f);
+	// Plano X - Y
+	glColor3f(1.0f, 0.0f, 0.0f); // Color rojo
+	glBegin(GL_QUADS);
+	glVertex3f(-size, size, 0.0f);
+	glVertex3f(-size, -size, 0.0f);
+	glVertex3f(size, -size, 0.0f);
+	glVertex3f(size, size, 0.0f);
+	glEnd();
 
+	// Plano X - Z
+	glColor3f(0.0f, 1.0f, 0.0f); // Color verde
+	glBegin(GL_QUADS);
+	glVertex3f(-size, 0.0f, size);
+	glVertex3f(-size, 0.0f, -size);
+	glVertex3f(size, 0.0f, -size);
+	glVertex3f(size, 0.0f, size);
+	glEnd();
 
+	// Plano Y - Z
+	glColor3f(0.0f, 0.0f, 1.0f); // Color azul
+	glBegin(GL_QUADS);
+	glVertex3f(0.0f, -size, size);
+	glVertex3f(0.0f, -size, -size);
+	glVertex3f(0.0f, size, -size);
+	glVertex3f(0.0f, size, size);
+	glEnd();
+	glPopMatrix();
+}
 
-void Display(void)
-{
+void display(void) {
 	// Borramos la escena
+	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	if (ejes) {
-		DrawAxes();
+		drawAxes();
 	}
 
+	if (planes) {
+		drawPlanes();
+	}
 
 	switch (figura) {
 	case 1:
-
 		glPushMatrix();
-		glRotatef(fAngulo, 0.0f, 0.0f, 1.0f);
+		glRotatef(fAngulo, 0.0f, 1.0f, 0.0f);
 		glColor3f(0.5, 0.5, 0.5);
-		glutWireTeapot(5); // Dibuja un teapot sólido con un radio de 0.5 unidades
+		if (solid) {
+			glutSolidTeapot(5); // Dibuja un teapot sólido con un radio de 0.5 unidades
+		} else {
+			glutWireTeapot(5); // Dibuja un teapot delineado con un radio de 0.5 unidades
+		}
 		glPopMatrix();
 		break;
 	case 2:
 		glPushMatrix();
 		glRotatef(fAngulo, 0.0f, 0.0f, 1.0f);
 		glColor3f(0.5, 0.5, 0.5);
-		glutWireCone(5, 5, 5, 5); // Dibuja un teapot sólido con un radio de 0.5 unidades
+		if (solid) {
+			glutSolidCone(5, 5, 5, 5); // Dibuja un cono sólido con un radio de 0.5 unidades
+		} else {
+			glutWireCone(5, 5, 5, 5); // Dibuja un cono delineado con un radio de 0.5 unidades
+		}
 		glPopMatrix();
 		break;
 	case 3:
@@ -72,25 +112,29 @@ void Display(void)
 		glRotatef(fAngulo, 0.0f, 0.0f, 1.0f);
 		glColor3f(1.0f, 0.5f, 0.0f);
 		glScalef(5.0f, 5.0f, 5.0f);
-		glutWireTetrahedron(); 
+		if (solid) {
+			glutSolidTetrahedron();
+		} else {
+			glutWireTetrahedron();
+		}
 		glPopMatrix();
 		break;
 	case 4:
 		glPushMatrix();
 		glRotatef(fAngulo, 0.0f, 0.0f, 1.0f);
 		glColor4f(1.0f, 0.0f, 1.0f, 0.0f);
-		glutWireCube(5);// Dibuja un cubo con un tamaño de 5
+		if (solid) {
+			glutSolidCube(5);// Dibuja un cubo sólido con un tamaño de 0.5
+		} else {
+			glutWireCube(5);// Dibuja un cubo delineado con un tamaño de 5
+		}
 		glPopMatrix();
 		break;
 	default:
 		break;
 	}
-
-
-
 	glFlush();
 }
-
 
 // Función que se ejecuta cuando se redimensiona la ventana
 void reshape(int width, int height) {
@@ -103,44 +147,53 @@ void reshape(int width, int height) {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	// Reemplazamos gluPerspective por glFrustum
-	glFrustum(-1.0, 1.0, -1.0, 1.0, 1.0, 20.0);
+	int ratio=width/height;
+
+	if (ratio >= 1.0) {
+		//glOrtho(-1.0 * ratio, 1.0f * ratio, -1.0, 1.0f, -1.0, 1.0f);
+		glFrustum(-1.0 * ratio, 1.0f * ratio, -1.0, 1.0f, 1.0f, 500.0f);
+	}
+	else {
+		//glOrtho(-1.0, 1.0f, -1.0 / ratio, 1.0f / ratio, -1.0, 1.0f);
+		glFrustum(-1.0, 1.0f, -1.0/ratio, 1.0f/ratio, 1.0f, 500.0f);
+	}
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	gluLookAt(0.0, 5.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+	gluLookAt(5.0, 5.0, 15.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 }
 
-void teclas(unsigned char key, int x, int y) {
-
-
+void userInput(unsigned char key, int x, int y) {
 	switch (key) {
-	case '1':
-		figura = 1;
-		break;
-	case '2':
-		figura = 2;
-		break;
-	case '3':
-		figura = 3;
-		break;
-	case '4':
-		figura = 4;
-		break;
-	case 'e':
-		ejes = !ejes;
-		break;
-	default:
-		figura = 0;
-		break;
+		case '1':
+			figura = 1;
+			break;
+		case '2':
+			figura = 2;
+			break;
+		case '3':
+			figura = 3;
+			break;
+		case '4':
+			figura = 4;
+			break;
+		case 'e':
+			ejes = !ejes;
+			break;
+		case 'p':
+			planes = !planes;
+			break;
+		case 's':
+			solid = !solid;
+			break;
+		default:
+			figura = 0;
+			break;
 	}
-
 }
-
 
 // Funci�n que se ejecuta cuando el sistema no esta ocupado
-void Idle(void)
-{
+void idle(void) {
 	// Incrementamos el �ngulo
 	fAngulo += 0.03f;
 	// Si es mayor que dos pi la decrementamos
@@ -153,29 +206,22 @@ void Idle(void)
 }
 
 // Funci�n principal
-int main(int argc, char** argv)
-{
+int main(int argc, char** argv) {
 	// Inicializamos la librer�a GLUT
 	glutInit(&argc, argv);
-
 	// Indicamos como ha de ser la nueva ventana
 	glutInitWindowPosition(100, 100);
 	glutInitWindowSize(W_WIDTH, W_HEIGHT);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
 
-
 	// Creamos la nueva ventana
 	glutCreateWindow("Etapa 3");
 
 	// Indicamos cuales son las funciones de redibujado e idle
-	glutDisplayFunc(Display);
-	glutIdleFunc(Idle);
-
+	glutDisplayFunc(display);
+	glutIdleFunc(idle);
 	glutReshapeFunc(reshape);
-
-	glutKeyboardFunc(teclas);
-
-
+	glutKeyboardFunc(userInput);
 
 	// El color de fondo ser� el negro (RGBA, RGB + Alpha channel)
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
