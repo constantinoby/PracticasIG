@@ -14,7 +14,6 @@ bool planes = false;
 
 void drawAxes() {
 	glPushMatrix();
-	//glRotatef(fAngulo, 0.0f, 0.0f, 1.0f);
 	// Eje X
 	glColor3f(1.0f, 0.0f, 0.0f); // Color rojo
 	glBegin(GL_LINES);
@@ -88,7 +87,7 @@ void display(void) {
 	switch (figura) {
 	case 1:
 		glPushMatrix();
-		glRotatef(fAngulo, 0.0f, 0.0f, 1.0f);
+		glRotatef(fAngulo, 0.0f, 1.0f, 0.0f);
 		glColor3f(0.5, 0.5, 0.5);
 		if (solid) {
 			glutSolidTeapot(5); // Dibuja un teapot sólido con un radio de 0.5 unidades
@@ -102,9 +101,9 @@ void display(void) {
 		glRotatef(fAngulo, 0.0f, 0.0f, 1.0f);
 		glColor3f(0.5, 0.5, 0.5);
 		if (solid) {
-			glutSolidCone(5, 5, 5, 5); // Dibuja un teapot sólido con un radio de 0.5 unidades
+			glutSolidCone(5, 5, 5, 5); // Dibuja un cono sólido con un radio de 0.5 unidades
 		} else {
-			glutWireCone(5, 5, 5, 5); // Dibuja un teapot sólido con un radio de 0.5 unidades
+			glutWireCone(5, 5, 5, 5); // Dibuja un cono delineado con un radio de 0.5 unidades
 		}
 		glPopMatrix();
 		break;
@@ -125,9 +124,9 @@ void display(void) {
 		glRotatef(fAngulo, 0.0f, 0.0f, 1.0f);
 		glColor4f(1.0f, 0.0f, 1.0f, 0.0f);
 		if (solid) {
-			glutSolidCube(5);// Dibuja un cubo con un tamaño de 5
+			glutSolidCube(5);// Dibuja un cubo sólido con un tamaño de 0.5
 		} else {
-			glutWireCube(5);// Dibuja un cubo con un tamaño de 5
+			glutWireCube(5);// Dibuja un cubo delineado con un tamaño de 5
 		}
 		glPopMatrix();
 		break;
@@ -148,8 +147,16 @@ void reshape(int width, int height) {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	// Reemplazamos gluPerspective por glFrustum
-	glFrustum(-1.0, 1.0, -1.0, 1.0, 1.0, 20.0);
+	int ratio=width/height;
+
+	if (ratio >= 1.0) {
+		//glOrtho(-1.0 * ratio, 1.0f * ratio, -1.0, 1.0f, -1.0, 1.0f);
+		glFrustum(-1.0 * ratio, 1.0f * ratio, -1.0, 1.0f, 1.0f, 500.0f);
+	}
+	else {
+		//glOrtho(-1.0, 1.0f, -1.0 / ratio, 1.0f / ratio, -1.0, 1.0f);
+		glFrustum(-1.0, 1.0f, -1.0/ratio, 1.0f/ratio, 1.0f, 500.0f);
+	}
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
