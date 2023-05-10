@@ -12,6 +12,21 @@ bool ejes = true;
 bool solid = false;
 bool planes = false;
 
+bool lateralMode = false;
+bool rotationMode = false;
+bool angularMode = true;
+
+GLdouble increment = 0.2;
+GLdouble xPosition = 5.0;
+GLdouble yPosition = 5.0;
+GLdouble zPosition = 15.0;
+GLdouble centerX = 0.0;
+GLdouble centerY = 0.0;
+GLdouble centerZ = 0.0;
+GLdouble upX = 0.0;
+GLdouble upY = 1.0;
+GLdouble upZ = 0.0;
+
 void drawAxes() {
 	glPushMatrix();
 	// Eje X
@@ -75,6 +90,8 @@ void display(void) {
 	// Borramos la escena
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glLoadIdentity();
+	gluLookAt(xPosition, yPosition, zPosition, centerX, centerY, centerZ, upX, upY, upZ);
 
 	if (ejes) {
 		drawAxes();
@@ -153,18 +170,11 @@ void reshape(int width, int height) {
 
 	int ratio = width / height;
 
-	if (ratio >= 1.0) {
-		//glOrtho(-1.0 * ratio, 1.0f * ratio, -1.0, 1.0f, -1.0, 1.0f);
-		glFrustum(-1.0 * ratio, 1.0f * ratio, -1.0, 1.0f, 1.0f, 500.0f);
-	}
-	else {
-		//glOrtho(-1.0, 1.0f, -1.0 / ratio, 1.0f / ratio, -1.0, 1.0f);
-		glFrustum(-1.0, 1.0f, -1.0 / ratio, 1.0f / ratio, 1.0f, 500.0f);
-	}
+	gluPerspective(90, ratio, 1.0, 100);
 
 	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	gluLookAt(5.0, 5.0, 15.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+	//glLoadIdentity();
+	//gluLookAt(xPosition, 5.0, 15.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 }
 
 void userInput(unsigned char key, int x, int y) {
@@ -190,10 +200,76 @@ void userInput(unsigned char key, int x, int y) {
 	case 's':
 		solid = !solid;
 		break;
+	case '8':
+		lateralMode = true;
+		angularMode = false;
+		rotationMode = false;
+		break;
+	case '9':
+		lateralMode = false;
+		angularMode = true;
+		rotationMode = false;
+		break;
+	case '0':
+		lateralMode = false;
+		angularMode = false;
+		rotationMode = true;
+		break;
 	default:
 		figura = 0;
 		break;
 	}
+}
+
+void cameraMovement(int key, int x, int y) {
+	if (lateralMode) { //la camara se mueve lateralmente
+		switch (key) {
+			case GLUT_KEY_UP: //Nos acercamos al objeto
+				yPosition += increment;
+				break;
+			case GLUT_KEY_DOWN: //Nos alejamos del objeto
+				yPosition += increment;
+				break;
+			case GLUT_KEY_RIGHT: //Nos movemos lateralmente hacia la derecha
+				right = !right;
+				break;
+			case GLUT_KEY_LEFT: //Nos movemos lateralmente hacia la izquierda
+				left = !left;
+				break;
+		}
+	} else if (rotationMode) { //la camara rota sobre si misma
+		switch (key) {
+			case GLUT_KEY_UP: //sube la mirada
+				yPosition += increment;
+				break;
+			case GLUT_KEY_DOWN: //baja la mirada
+				yPosition += increment;
+				break;
+			case GLUT_KEY_RIGHT: //rota hacia la derecha
+				right = !right;
+				break;
+			case GLUT_KEY_LEFT: //rota hacia la izquierda
+				left = !left;
+				break;
+		}
+	} else if (angularMode) {
+		switch (key) {
+			case GLUT_KEY_UP: //rota alrededor de la escena hacia arriba
+				yPosition += increment;
+				xPosition += cos();
+				break;
+			case GLUT_KEY_DOWN: //rota alrededor de la escena hacia abajo
+				yPosition += increment;
+				break;
+			case GLUT_KEY_RIGHT: //rota alrededor de la escena hacia la derecha
+				right = !right;
+				break;
+			case GLUT_KEY_LEFT: //rota alrededor de la escena hacia la izquierda
+				left = !left;
+				break;
+		}
+	}
+	glutPostRedisplay();
 }
 
 // Funci�n que se ejecuta cuando el sistema no esta ocupado
@@ -206,7 +282,6 @@ void idle(void) {
 	// Indicamos que es necesario repintar la pantalla
 	glutPostRedisplay();
 	glutSwapBuffers();
-
 }
 
 // Funci�n principal
@@ -226,6 +301,8 @@ int main(int argc, char** argv) {
 	glutIdleFunc(idle);
 	glutReshapeFunc(reshape);
 	glutKeyboardFunc(userInput);
+	glutSpecialFunc(cameraMovement);
+	glutSpecialUpFunc(cameraMovement);
 
 	// El color de fondo ser� el negro (RGBA, RGB + Alpha channel)
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
