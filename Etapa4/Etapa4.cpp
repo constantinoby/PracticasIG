@@ -7,6 +7,8 @@
 const int W_WIDTH = 600; // Tama�o incial de la ventana
 const int W_HEIGHT = 600;
 GLfloat fAngulo; // Variable que indica el �ngulo de rotaci�n de los ejes. 
+float horizontalCameraAngle = 0;
+float verticalCameraAngle = 0;
 int figura = 0;
 bool ejes = true;
 bool solid = false;
@@ -16,9 +18,9 @@ bool lateralMode = false;
 bool rotationMode = false;
 bool angularMode = true;
 
-GLdouble increment = 0.2;
-GLdouble xPosition = 5.0;
-GLdouble yPosition = 5.0;
+float increment = 0.2;
+GLdouble xPosition = 0.0;//5.0;
+GLdouble yPosition = 0.0;//5.0;
 GLdouble zPosition = 15.0;
 GLdouble centerX = 0.0;
 GLdouble centerY = 0.0;
@@ -221,51 +223,83 @@ void userInput(unsigned char key, int x, int y) {
 	}
 }
 
+void anglesNormalization() {
+	if (horizontalCameraAngle >= 360) {
+		horizontalCameraAngle -= 360;
+	} else if (horizontalCameraAngle <= 0) {
+		horizontalCameraAngle += 360;
+	}
+	if (verticalCameraAngle >= 360) {
+		verticalCameraAngle -= 360;
+	}
+	else if (verticalCameraAngle <= 0) {
+		verticalCameraAngle += 360;
+	}
+}
+
 void cameraMovement(int key, int x, int y) {
-	if (lateralMode) { //la camara se mueve lateralmente
+	anglesNormalization();
+	if (lateralMode) { //la camara se mueve lateralmente CODIGO 8
 		switch (key) {
 			case GLUT_KEY_UP: //Nos acercamos al objeto
-				yPosition += increment;
+				//yPosition += increment;
+				//xPosition += increment;
 				break;
 			case GLUT_KEY_DOWN: //Nos alejamos del objeto
-				yPosition += increment;
+				//yPosition += increment;
 				break;
 			case GLUT_KEY_RIGHT: //Nos movemos lateralmente hacia la derecha
-				right = !right;
+				xPosition += increment * cos(horizontalCameraAngle);
+				zPosition += increment * sin(horizontalCameraAngle);
+				centerX += increment * cos(horizontalCameraAngle);
+				centerZ += increment * sin(horizontalCameraAngle);
 				break;
 			case GLUT_KEY_LEFT: //Nos movemos lateralmente hacia la izquierda
-				left = !left;
+				xPosition -= increment * cos(horizontalCameraAngle);
+				zPosition -= increment * sin(horizontalCameraAngle);
+				centerX -= increment * cos(horizontalCameraAngle);
+				centerZ -= increment * sin(horizontalCameraAngle);
 				break;
 		}
-	} else if (rotationMode) { //la camara rota sobre si misma
+	} else if (rotationMode) { //la camara rota sobre si misma CODIGO 0
 		switch (key) {
 			case GLUT_KEY_UP: //sube la mirada
-				yPosition += increment;
+				verticalCameraAngle += increment;
+				centerY = sqrt((xPosition * xPosition) + (zPosition * zPosition)) * sin(verticalCameraAngle);
 				break;
 			case GLUT_KEY_DOWN: //baja la mirada
-				yPosition += increment;
+				verticalCameraAngle -= increment;
+				centerY = sqrt((xPosition * xPosition) + (zPosition * zPosition)) * sin(verticalCameraAngle);
+				//centerY -= increment * sin(verticalCameraAngle);
 				break;
 			case GLUT_KEY_RIGHT: //rota hacia la derecha
-				right = !right;
+				horizontalCameraAngle += increment;
+				centerX += increment * cos(horizontalCameraAngle);
+				centerZ += increment * sin(horizontalCameraAngle);
 				break;
 			case GLUT_KEY_LEFT: //rota hacia la izquierda
-				left = !left;
+				horizontalCameraAngle -= increment;
+				centerX -= increment * cos(horizontalCameraAngle);
+				centerZ -= increment * sin(horizontalCameraAngle);
 				break;
 		}
-	} else if (angularMode) {
+	} else if (angularMode) { //CODIGO 9
 		switch (key) {
 			case GLUT_KEY_UP: //rota alrededor de la escena hacia arriba
-				yPosition += increment;
-				xPosition += cos();
+				//yPosition += increment;
+				//xPosition += cos();
+				upX += increment;
 				break;
 			case GLUT_KEY_DOWN: //rota alrededor de la escena hacia abajo
-				yPosition += increment;
+				upY += increment;
 				break;
 			case GLUT_KEY_RIGHT: //rota alrededor de la escena hacia la derecha
-				right = !right;
+				upZ += increment;
 				break;
 			case GLUT_KEY_LEFT: //rota alrededor de la escena hacia la izquierda
-				left = !left;
+				upX -= increment;
+				upY -= increment;
+				upZ -= increment;
 				break;
 		}
 	}
