@@ -6,6 +6,7 @@
 
 const int W_WIDTH = 600; // Tama�o incial de la ventana
 const int W_HEIGHT = 600;
+const float pi = 3.14159f;
 GLfloat fAngulo; // Variable que indica el �ngulo de rotaci�n de los ejes. 
 float horizontalCameraAngle = 0;
 float verticalCameraAngle = 0;
@@ -18,7 +19,7 @@ bool lateralMode = false;
 bool rotationMode = false;
 bool angularMode = true;
 
-float increment = 0.2;
+float increment = 0.2f;
 GLdouble xPosition = 0.0;//5.0;
 GLdouble yPosition = 0.0;//5.0;
 GLdouble zPosition = 15.0;
@@ -28,6 +29,14 @@ GLdouble centerZ = 0.0;
 GLdouble upX = 0.0;
 GLdouble upY = 1.0;
 GLdouble upZ = 0.0;
+
+float gradsToRads(float grads) {
+	return (grads * pi) / 180;
+}
+
+float radsToGrads(float rads) {
+	return (rads * 180) / pi;
+}
 
 void drawAxes() {
 	glPushMatrix();
@@ -88,21 +97,7 @@ void drawPlanes() {
 	glPopMatrix();
 }
 
-void display(void) {
-	// Borramos la escena
-	glEnable(GL_DEPTH_TEST);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glLoadIdentity();
-	gluLookAt(xPosition, yPosition, zPosition, centerX, centerY, centerZ, upX, upY, upZ);
-
-	if (ejes) {
-		drawAxes();
-	}
-
-	if (planes) {
-		drawPlanes();
-	}
-
+void drawFigure() {
 	switch (figura) {
 	case 1:
 		glPushMatrix();
@@ -156,6 +151,26 @@ void display(void) {
 	default:
 		break;
 	}
+}
+
+void display(void) {
+	// Borramos la escena
+	glEnable(GL_DEPTH_TEST);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glLoadIdentity();
+	gluLookAt(xPosition, yPosition, zPosition, centerX, centerY, centerZ, upX, upY, upZ);
+
+	if (ejes) {
+		drawAxes();
+	}
+
+	if (planes) {
+		drawPlanes();
+	}
+
+	drawFigure();
+
+	
 	glFlush();
 }
 
@@ -237,11 +252,26 @@ void anglesNormalization() {
 	}
 }
 
+void rotateCameraHorizontally() {
+	printf("angulo %f ||", horizontalCameraAngle);
+	float radiansHorizontal = gradsToRads(horizontalCameraAngle);
+	GLdouble newXDirection = 0;
+	GLdouble newZDirection = 0;
+	newXDirection = sqrt((xPosition * xPosition) + (zPosition * zPosition)) * cos(radiansHorizontal);
+	newZDirection = sqrt((xPosition * xPosition) + (zPosition * zPosition)) * sin(radiansHorizontal);
+	centerX = newXDirection;
+	centerZ = newZDirection;
+	printf("centerX %f || ", centerX);
+	printf("centerZ %f \n", centerZ);
+}
+
 void cameraMovement(int key, int x, int y) {
 	anglesNormalization();
+	float radiansHorizontal = 0;
 	if (lateralMode) { //la camara se mueve lateralmente CODIGO 8
 		switch (key) {
 			case GLUT_KEY_UP: //Nos acercamos al objeto
+				xPosition -= increment;
 				//yPosition += increment;
 				//xPosition += increment;
 				break;
@@ -249,41 +279,66 @@ void cameraMovement(int key, int x, int y) {
 				//yPosition += increment;
 				break;
 			case GLUT_KEY_RIGHT: //Nos movemos lateralmente hacia la derecha
-				xPosition += increment * cos(horizontalCameraAngle);
-				zPosition += increment * sin(horizontalCameraAngle);
-				centerX += increment * cos(horizontalCameraAngle);
-				centerZ += increment * sin(horizontalCameraAngle);
+				radiansHorizontal = gradsToRads(horizontalCameraAngle);
+				xPosition += increment * cos(radiansHorizontal);
+				zPosition += increment * sin(radiansHorizontal);
+				centerX += increment * cos(radiansHorizontal);
+				centerZ += increment * sin(radiansHorizontal);
 				break;
 			case GLUT_KEY_LEFT: //Nos movemos lateralmente hacia la izquierda
-				xPosition -= increment * cos(horizontalCameraAngle);
-				zPosition -= increment * sin(horizontalCameraAngle);
-				centerX -= increment * cos(horizontalCameraAngle);
-				centerZ -= increment * sin(horizontalCameraAngle);
+				radiansHorizontal = gradsToRads(horizontalCameraAngle);
+				xPosition -= increment * cos(radiansHorizontal);
+				zPosition -= increment * sin(radiansHorizontal);
+				centerX -= increment * cos(radiansHorizontal);
+				centerZ -= increment * sin(radiansHorizontal);
 				break;
 		}
 	} else if (rotationMode) { //la camara rota sobre si misma CODIGO 0
+		GLdouble newXDirection = 0;
+		GLdouble newZDirection = 0;
+		GLdouble newUpX = 0;
+		GLdouble newUpY = 0;
+		GLdouble newUpZ = 0;
+		GLdouble aux = 0;
+		float radiansVertical = 0;
 		switch (key) {
 			case GLUT_KEY_UP: //sube la mirada
-				verticalCameraAngle += increment;
-				centerY = sqrt((xPosition * xPosition) + (zPosition * zPosition)) * sin(verticalCameraAngle);
+				verticalCameraAngle += increment * 10;
+				radiansVertical = gradsToRads(verticalCameraAngle);
+				centerY = sqrt(sqrt((xPosition * xPosition) + (zPosition * zPosition)) + (yPosition * yPosition)) * sin(radiansVertical);
+				/*aux = sqrt((xPosition * xPosition) + (zPosition * zPosition)) * cos(radiansVertical);
+				newXDirection += centerX;
+				newZDirection += centerZ;
+				newXDirection += aux * cos(radiansHorizontal);
+				newZDirection += aux * sin(radiansHorizontal);
+				centerX = newXDirection;
+				centerZ = newZDirection;*/
 				break;
 			case GLUT_KEY_DOWN: //baja la mirada
-				verticalCameraAngle -= increment;
-				centerY = sqrt((xPosition * xPosition) + (zPosition * zPosition)) * sin(verticalCameraAngle);
+				verticalCameraAngle -= increment * 10;
+				radiansVertical = gradsToRads(verticalCameraAngle);
+				centerY = sqrt(sqrt((xPosition * xPosition) + (zPosition * zPosition)) + (yPosition * yPosition)) * sin(radiansVertical);
+				/*newXDirection -= sqrt((xPosition * xPosition) + (zPosition * zPosition)) * cos(radiansHorizontal);
+				newZDirection -= sqrt((xPosition * xPosition) + (zPosition * zPosition)) * sin(radiansHorizontal);
+				centerX = newXDirection;
+				centerZ = newZDirection;*/
+				//centerY = sqrt((xPosition * xPosition) + (zPosition * zPosition)) * sin(verticalCameraAngle);
 				//centerY -= increment * sin(verticalCameraAngle);
 				break;
 			case GLUT_KEY_RIGHT: //rota hacia la derecha
-				horizontalCameraAngle += increment;
-				centerX += increment * cos(horizontalCameraAngle);
-				centerZ += increment * sin(horizontalCameraAngle);
+				horizontalCameraAngle += increment*10;
+				rotateCameraHorizontally();
 				break;
 			case GLUT_KEY_LEFT: //rota hacia la izquierda
-				horizontalCameraAngle -= increment;
-				centerX -= increment * cos(horizontalCameraAngle);
-				centerZ -= increment * sin(horizontalCameraAngle);
+				horizontalCameraAngle -= increment*10;
+				rotateCameraHorizontally();
+				//centerX -= increment * cos(horizontalCameraAngle);
+				//centerZ -= increment * sin(horizontalCameraAngle);
 				break;
 		}
 	} else if (angularMode) { //CODIGO 9
+		GLdouble newX = 0;
+		GLdouble newZ = 0;
 		switch (key) {
 			case GLUT_KEY_UP: //rota alrededor de la escena hacia arriba
 				//yPosition += increment;
@@ -294,12 +349,22 @@ void cameraMovement(int key, int x, int y) {
 				upY += increment;
 				break;
 			case GLUT_KEY_RIGHT: //rota alrededor de la escena hacia la derecha
-				upZ += increment;
+				horizontalCameraAngle += increment * 10;
+				radiansHorizontal = gradsToRads(horizontalCameraAngle);
+				newX = sqrt((xPosition * xPosition) + (zPosition * zPosition)) * sin(radiansHorizontal);
+				newZ = sqrt((xPosition * xPosition) + (zPosition * zPosition)) * cos(radiansHorizontal);
+				xPosition = newX;
+				zPosition = newZ;
+				printf("xPosition: %f    zPosition: %f \n", xPosition, zPosition);
 				break;
 			case GLUT_KEY_LEFT: //rota alrededor de la escena hacia la izquierda
-				upX -= increment;
-				upY -= increment;
-				upZ -= increment;
+				horizontalCameraAngle -= increment * 10;
+				radiansHorizontal = gradsToRads(horizontalCameraAngle);
+				newX = sqrt((xPosition * xPosition) + (zPosition * zPosition)) * sin(radiansHorizontal);
+				newZ = sqrt((xPosition * xPosition) + (zPosition * zPosition)) * cos(radiansHorizontal);
+				xPosition = newX;
+				zPosition = newZ;
+				printf("xPosition: %f    zPosition: %f \n", xPosition, zPosition);
 				break;
 		}
 	}
