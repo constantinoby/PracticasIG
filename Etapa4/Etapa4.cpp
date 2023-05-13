@@ -10,6 +10,8 @@ const float pi = 3.14159f;
 GLfloat fAngulo; // Variable que indica el �ngulo de rotaci�n de los ejes. 
 float horizontalCameraAngle = 0;
 float verticalCameraAngle = 0;
+float horizontalSceneAngle = 0;
+float verticalSceneAngle = 0;
 int figura = 0;
 bool ejes = true;
 bool solid = false;
@@ -226,6 +228,9 @@ void userInput(unsigned char key, int x, int y) {
 		lateralMode = false;
 		angularMode = true;
 		rotationMode = false;
+		centerX = 0.0;
+		centerY = 0.0;
+		centerZ = 0.0;
 		break;
 	case '0':
 		lateralMode = false;
@@ -349,8 +354,8 @@ void cameraMovement(int key, int x, int y) {
 				upY += increment;
 				break;
 			case GLUT_KEY_RIGHT: //rota alrededor de la escena hacia la derecha
-				horizontalCameraAngle += increment * 10;
-				radiansHorizontal = gradsToRads(horizontalCameraAngle);
+				horizontalSceneAngle += increment * 10;
+				radiansHorizontal = gradsToRads(horizontalSceneAngle);
 				newX = sqrt((xPosition * xPosition) + (zPosition * zPosition)) * sin(radiansHorizontal);
 				newZ = sqrt((xPosition * xPosition) + (zPosition * zPosition)) * cos(radiansHorizontal);
 				xPosition = newX;
@@ -358,8 +363,8 @@ void cameraMovement(int key, int x, int y) {
 				printf("xPosition: %f    zPosition: %f \n", xPosition, zPosition);
 				break;
 			case GLUT_KEY_LEFT: //rota alrededor de la escena hacia la izquierda
-				horizontalCameraAngle -= increment * 10;
-				radiansHorizontal = gradsToRads(horizontalCameraAngle);
+				horizontalSceneAngle -= increment * 10;
+				radiansHorizontal = gradsToRads(horizontalSceneAngle);
 				newX = sqrt((xPosition * xPosition) + (zPosition * zPosition)) * sin(radiansHorizontal);
 				newZ = sqrt((xPosition * xPosition) + (zPosition * zPosition)) * cos(radiansHorizontal);
 				xPosition = newX;
