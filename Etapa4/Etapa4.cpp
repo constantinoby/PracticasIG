@@ -196,6 +196,30 @@ void reshape(int width, int height) {
 	//gluLookAt(xPosition, 5.0, 15.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 }
 
+void recalculateHorizontalCameraAngle() {
+	double xDistance = xPosition - centerX;
+	double zDistance = zPosition - centerZ;
+	double distance = sqrt((xDistance * xDistance) + (zDistance * zDistance));
+	float rads = asin(zPosition / distance);
+	printf("Horizontal Scene angle in rads: %f || ", rads);
+	float aux = rads * 180; //por algun motivo se cambia el signo cuando el angulo se acerca a 270 o al equivalente en negativo
+	aux = aux / pi;
+	printf("CC: %f Distancia: %f ", zPosition, distance);
+	horizontalCameraAngle = -aux; //radsToGrads(asin( zPosition / distance ));
+	printf("Angle %f \n", horizontalCameraAngle);
+}
+
+void recalculateSceneAngle() {
+	double distance = sqrt((xPosition * xPosition) + (zPosition * zPosition));
+	float rads = acos(zPosition / distance);
+	printf("Horizontal Scene angle in rads: %f || ", rads);
+	float aux = rads * 180; //por algun motivo se cambia el signo cuando el angulo se acerca a 270 o al equivalente en negativo
+	aux = aux / pi;
+	printf("Variable aux in grads: %f || ", aux);
+	horizontalSceneAngle = aux; //radsToGrads(acos(zPosition / distance));
+	printf("Angle %f \n", horizontalSceneAngle);
+}
+
 void userInput(unsigned char key, int x, int y) {
 	switch (key) {
 	case '1':
@@ -231,11 +255,13 @@ void userInput(unsigned char key, int x, int y) {
 		centerX = 0.0;
 		centerY = 0.0;
 		centerZ = 0.0;
+		recalculateSceneAngle();
 		break;
 	case '0':
 		lateralMode = false;
 		angularMode = false;
 		rotationMode = true;
+		recalculateHorizontalCameraAngle();
 		break;
 	default:
 		figura = 0;
@@ -255,19 +281,39 @@ void anglesNormalization() {
 	else if (verticalCameraAngle <= 0) {
 		verticalCameraAngle += 360;
 	}
+
+	if (horizontalSceneAngle >= 360) {
+		horizontalSceneAngle -= 360;
+	}
+	else if (horizontalSceneAngle <= 0) {
+		horizontalSceneAngle += 360;
+	}
+	if (verticalSceneAngle >= 360) {
+		verticalSceneAngle -= 360;
+	}
+	else if (verticalSceneAngle <= 0) {
+		verticalSceneAngle += 360;
+	}
 }
 
 void rotateCameraHorizontally() {
 	printf("angulo %f ||", horizontalCameraAngle);
 	float radiansHorizontal = gradsToRads(horizontalCameraAngle);
-	GLdouble newXDirection = 0;
-	GLdouble newZDirection = 0;
-	newXDirection = sqrt((xPosition * xPosition) + (zPosition * zPosition)) * cos(radiansHorizontal);
-	newZDirection = sqrt((xPosition * xPosition) + (zPosition * zPosition)) * sin(radiansHorizontal);
-	centerX = newXDirection;
-	centerZ = newZDirection;
+	double xDistance = xPosition - centerX;
+	double zDistance = zPosition - centerZ;
+	double radius = sqrt((xDistance * xDistance) + (zDistance * zDistance));
+	centerX = radius * cos(radiansHorizontal);
+	centerZ = radius * sin(radiansHorizontal);
 	printf("centerX %f || ", centerX);
 	printf("centerZ %f \n", centerZ);
+}
+
+void rotateCameraAroundSceneHorizontally() {
+	float radiansHorizontal = gradsToRads(horizontalSceneAngle);
+	double radius = sqrt((xPosition * xPosition) + (zPosition * zPosition));
+	xPosition = radius * sin(radiansHorizontal);
+	zPosition = radius * cos(radiansHorizontal);
+	printf("xPosition: %f    zPosition: %f	  SceneAngle: %f \n", xPosition, zPosition, horizontalSceneAngle);
 }
 
 void cameraMovement(int key, int x, int y) {
@@ -276,11 +322,59 @@ void cameraMovement(int key, int x, int y) {
 	if (lateralMode) { //la camara se mueve lateralmente CODIGO 8
 		switch (key) {
 			case GLUT_KEY_UP: //Nos acercamos al objeto
-				xPosition -= increment;
+				if (xPosition < centerX) {
+					xPosition += increment;
+					centerX += increment;
+				}
+				else if(xPosition > centerX){
+					xPosition -= increment;
+					centerX -= increment;
+				}
+				if (yPosition < centerY) {
+					yPosition += increment;
+					centerY += increment;
+				}
+				else if (yPosition > centerY) {
+					yPosition -= increment;
+					centerY -= increment;
+				}
+				if (zPosition < centerZ) {
+					zPosition += increment;
+					centerZ += increment;
+				}
+				else if (zPosition > centerZ) {
+					zPosition -= increment;
+					centerZ -= increment;
+				}
+				//xPosition -= increment;
 				//yPosition += increment;
 				//xPosition += increment;
 				break;
 			case GLUT_KEY_DOWN: //Nos alejamos del objeto
+				if (xPosition < centerX) {
+					xPosition -= increment;
+					centerX -= increment;
+				}
+				else if (xPosition > centerX) {
+					xPosition += increment;
+					centerX += increment;
+				}
+				if (yPosition < centerY) {
+					yPosition -= increment;
+					centerY -= increment;
+				}
+				else if (yPosition > centerY) {
+					yPosition += increment;
+					centerY += increment;
+				}
+				if (zPosition < centerZ) {
+					zPosition -= increment;
+					centerZ -= increment;
+				}
+				else if (zPosition > centerZ) {
+					zPosition += increment;
+					centerZ += increment;
+				}
 				//yPosition += increment;
 				break;
 			case GLUT_KEY_RIGHT: //Nos movemos lateralmente hacia la derecha
@@ -310,6 +404,7 @@ void cameraMovement(int key, int x, int y) {
 			case GLUT_KEY_UP: //sube la mirada
 				verticalCameraAngle += increment * 10;
 				radiansVertical = gradsToRads(verticalCameraAngle);
+				//printf("");
 				centerY = sqrt(sqrt((xPosition * xPosition) + (zPosition * zPosition)) + (yPosition * yPosition)) * sin(radiansVertical);
 				/*aux = sqrt((xPosition * xPosition) + (zPosition * zPosition)) * cos(radiansVertical);
 				newXDirection += centerX;
@@ -355,21 +450,11 @@ void cameraMovement(int key, int x, int y) {
 				break;
 			case GLUT_KEY_RIGHT: //rota alrededor de la escena hacia la derecha
 				horizontalSceneAngle += increment * 10;
-				radiansHorizontal = gradsToRads(horizontalSceneAngle);
-				newX = sqrt((xPosition * xPosition) + (zPosition * zPosition)) * sin(radiansHorizontal);
-				newZ = sqrt((xPosition * xPosition) + (zPosition * zPosition)) * cos(radiansHorizontal);
-				xPosition = newX;
-				zPosition = newZ;
-				printf("xPosition: %f    zPosition: %f \n", xPosition, zPosition);
+				rotateCameraAroundSceneHorizontally();
 				break;
 			case GLUT_KEY_LEFT: //rota alrededor de la escena hacia la izquierda
 				horizontalSceneAngle -= increment * 10;
-				radiansHorizontal = gradsToRads(horizontalSceneAngle);
-				newX = sqrt((xPosition * xPosition) + (zPosition * zPosition)) * sin(radiansHorizontal);
-				newZ = sqrt((xPosition * xPosition) + (zPosition * zPosition)) * cos(radiansHorizontal);
-				xPosition = newX;
-				zPosition = newZ;
-				printf("xPosition: %f    zPosition: %f \n", xPosition, zPosition);
+				rotateCameraAroundSceneHorizontally();
 				break;
 		}
 	}
