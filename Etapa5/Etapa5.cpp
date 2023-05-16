@@ -33,8 +33,10 @@ GLdouble upY = 1.0;
 GLdouble upZ = 0.0;
 
 
-float light_position[] = { 1.0, 1.0, 1.0, 0.0 };
-float light_color[] = { 1.0, 1.0, 1.0, 1.0 };
+float light_position[] = { -3.0, 3.0, 10.0, 0.0 };
+
+
+GLenum  shading_mode = GL_SMOOTH;
 
 
 float gradsToRads(float grads) {
@@ -160,6 +162,14 @@ void drawFigure() {
 	}
 }
 
+void drawLight() {
+	glPopMatrix();
+	glTranslatef(light_position[0], light_position[1], light_position[2]);
+	glColor3f(1.0, 0.0, 0.0);
+	glutSolidSphere(0.2, 20, 20);
+	glPopMatrix();
+}
+
 
 void display(void) {
 	// Borramos la escena
@@ -173,6 +183,10 @@ void display(void) {
 	glLoadIdentity();
 	gluLookAt(xPosition, yPosition, zPosition, centerX, centerY, centerZ, upX, upY, upZ);
 
+	glShadeModel(shading_mode);
+	
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
 	if (ejes) {
 		drawAxes();
 	}
@@ -182,6 +196,8 @@ void display(void) {
 	}
 
 	drawFigure();
+
+	drawLight();
 
 	
 
@@ -276,14 +292,33 @@ void userInput(unsigned char key, int x, int y) {
 		rotationMode = true;
 		recalculateHorizontalCameraAngle();
 		break;
-
-	case 'a':
-
-		
-		glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-
-		glLightfv(GL_LIGHT0, GL_DIFFUSE, light_color);
-
+	case 'A': //Posicion 1 de la luz, mueve luz izquierda
+		light_position[0] -= 1.0;
+		break;
+	case 'Z': //Posicion 2 de la luz, mueve luz derecha
+		light_position[0] += 1.0;
+		break;
+	case 'S': //Posicion 3 de la luz, mueve luz abajo
+		light_position[1] -= 1.0;
+		break;
+	case 'X': //Posicion 4 de la luz, mueve luz arriba
+		light_position[1] += 1.0;
+		break;
+	case 'D': //Posicion 5 de la luz, meuve luz atras
+		light_position[2] -= 1.0;
+		break;
+	case 'C': //Posicion 6 de la luz, mueve luz delante
+		light_position[2] += 1.0;
+		break;
+	case ' ' :
+		if (shading_mode == GL_FLAT) {
+			shading_mode = GL_SMOOTH;
+		}else {
+			shading_mode = GL_FLAT;
+		}
+		break;
+	case 'm':
+		printf("ligt[0]: %f    ligt[1]: %f	  ligt[2]: %f \n", light_position[0], light_position[1], light_position[2]);
 		break;
 	default:
 		figura = 0;
