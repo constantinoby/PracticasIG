@@ -157,6 +157,60 @@ void drawFigure() {
 		}
 		glPopMatrix();
 		break;
+
+	case 5:
+		glPushMatrix();
+		glRotatef(fAngulo, 0.0f, 0.0f, 1.0f);
+		glScaled(2, 2, 2);
+		glBegin(GL_QUADS);
+
+		// Cara frontal
+		glNormal3f(0.0, 0.0, 1.0);
+		glVertex3f(-1.0, -1.0, 1.0);
+		glVertex3f(1.0, -1.0, 1.0);
+		glVertex3f(1.0, 1.0, 1.0);
+		glVertex3f(-1.0, 1.0, 1.0);
+
+		// Cara trasera
+		glNormal3f(0.0, 0.0, -1.0);
+		glVertex3f(1.0, -1.0, -1.0);
+		glVertex3f(-1.0, -1.0, -1.0);
+		glVertex3f(-1.0, 1.0, -1.0);
+		glVertex3f(1.0, 1.0, -1.0);
+
+		// Cara izquierda
+		glNormal3f(-1.0, 0.0, 0.0);
+		glVertex3f(-1.0, -1.0, -1.0);
+		glVertex3f(-1.0, -1.0, 1.0);
+		glVertex3f(-1.0, 1.0, 1.0);
+		glVertex3f(-1.0, 1.0, -1.0);
+
+		// Cara derecha
+		glNormal3f(1.0, 0.0, 0.0);
+		glVertex3f(1.0, -1.0, 1.0);
+		glVertex3f(1.0, -1.0, -1.0);
+		glVertex3f(1.0, 1.0, -1.0);
+		glVertex3f(1.0, 1.0, 1.0);
+
+		// Cara superior
+		glNormal3f(0.0, 1.0, 0.0);
+		glVertex3f(-1.0, 1.0, 1.0);
+		glVertex3f(1.0, 1.0, 1.0);
+		glVertex3f(1.0, 1.0, -1.0);
+		glVertex3f(-1.0, 1.0, -1.0);
+
+		// Cara inferior
+		glNormal3f(0.0, -1.0, 0.0);
+		glVertex3f(-1.0, -1.0, -1.0);
+		glVertex3f(1.0, -1.0, -1.0);
+		glVertex3f(1.0, -1.0, 1.0);
+		glVertex3f(-1.0, -1.0, 1.0);
+
+		glEnd();
+		glPopMatrix();
+
+		break;
+
 	default:
 		break;
 	}
@@ -262,6 +316,9 @@ void userInput(unsigned char key, int x, int y) {
 		break;
 	case '4':
 		figura = 4;
+		break;
+	case '5':
+		figura = 5;
 		break;
 	case 'e':
 		ejes = !ejes;
