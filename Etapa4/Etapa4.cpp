@@ -221,13 +221,13 @@ void reshape(int width, int height) {
 
 void recalculateHorizontalCameraAngle() {
 	if (horizontalCameraAngle != horizontalSceneAngle - 180) {
-		horizontalCameraAngle = horizontalSceneAngle - 180;
+		horizontalCameraAngle = (horizontalSceneAngle - 180) * upY;
 	}
 }
 
 void recalculateVerticalCameraAngle() {
 	if (verticalCameraAngle != -verticalSceneAngle) {
-		verticalCameraAngle = -verticalSceneAngle;
+		verticalCameraAngle = (-verticalSceneAngle) * upY;
 	}
 }
 
@@ -361,12 +361,33 @@ void updateVerticalCenter() {
 	printf("Vertical Angle = %f || ", verticalCameraAngle);
 }
 
-void rotateCameraAroundSceneHorizontally() {
+void updateHorizontalRotationAroundScene(double radius) {
 	float radiansHorizontal = gradsToRads(horizontalSceneAngle);
-	double radius = sqrt((xPosition * xPosition) + (zPosition * zPosition));
 	xPosition = radius * sin(radiansHorizontal);
 	zPosition = radius * cos(radiansHorizontal);
 	printf("xPosition: %f    zPosition: %f	  SceneAngle: %f \n", xPosition, zPosition, horizontalSceneAngle);
+}
+
+//void rotateCameraAroundSceneHorizontally() {
+//	//float radiansHorizontal = gradsToRads(horizontalSceneAngle);
+//	double radius = sqrt((xPosition * xPosition) + (zPosition * zPosition));
+//	//xPosition = radius * sin(radiansHorizontal);
+//	//zPosition = radius * cos(radiansHorizontal);
+//	printf("xPosition: %f    zPosition: %f	  SceneAngle: %f \n", xPosition, zPosition, horizontalSceneAngle);
+//}
+
+void rotateCameraAroundSceneVertically() {
+	float radiansVertical = gradsToRads(verticalSceneAngle);
+	double radius = sqrt((xPosition * xPosition) + (yPosition * yPosition) + (zPosition * zPosition));
+	yPosition = radius * sin(radiansVertical);
+	radius = radius * cos(radiansVertical);
+	updateHorizontalRotationAroundScene(radius);
+	printf("Vertical angle = %f \n ", verticalSceneAngle);
+	if ((verticalSceneAngle >= 90) && (verticalSceneAngle < 270)) {
+		upY = -1.0;
+	} else {
+		upY = 1.0;
+	}
 }
 
 void cameraMovement(int key, int x, int y) {
@@ -453,20 +474,20 @@ void cameraMovement(int key, int x, int y) {
 		double radius;
 		switch (key) {
 		case GLUT_KEY_UP: //sube la mirada
-			verticalCameraAngle += increment * 10;
+			verticalCameraAngle += increment * 10 * upY;
 			updateVerticalCenter();
 			break;
 		case GLUT_KEY_DOWN: //baja la mirada
-			verticalCameraAngle -= increment * 10;
+			verticalCameraAngle -= increment * 10 * upY;
 			updateVerticalCenter();
 			break;
 		case GLUT_KEY_RIGHT: //rota hacia la derecha
-			horizontalCameraAngle -= increment * 10;
+			horizontalCameraAngle -= increment * 10 * upY;
 			radius = sqrt((centerX * centerX) + (centerZ * centerZ));
 			updateHorizontalCenter(radius);
 			break;
 		case GLUT_KEY_LEFT: //rota hacia la izquierda
-			horizontalCameraAngle += increment * 10;
+			horizontalCameraAngle += increment * 10 * upY;
 			radius = sqrt((centerX * centerX) + (centerZ * centerZ));
 			updateHorizontalCenter(radius);
 			break;
@@ -481,22 +502,27 @@ void cameraMovement(int key, int x, int y) {
 	} else if (angularMode) { //CODIGO 9
 		GLdouble newX = 0;
 		GLdouble newZ = 0;
+		double radius;
 		switch (key) {
 		case GLUT_KEY_UP: //rota alrededor de la escena hacia arriba
-			//yPosition += increment;
-			//xPosition += cos();
-			upX += increment;
+			verticalSceneAngle += increment * 10;
+			rotateCameraAroundSceneVertically();
 			break;
 		case GLUT_KEY_DOWN: //rota alrededor de la escena hacia abajo
-			upY += increment;
+			verticalSceneAngle -= increment * 10;
+			rotateCameraAroundSceneVertically();
 			break;
 		case GLUT_KEY_RIGHT: //rota alrededor de la escena hacia la derecha
-			horizontalSceneAngle += increment * 10;
-			rotateCameraAroundSceneHorizontally();
+			horizontalSceneAngle += increment * 10 * upY;
+			radius = sqrt((xPosition * xPosition) + (zPosition * zPosition));
+			updateHorizontalRotationAroundScene(radius);
+			//rotateCameraAroundSceneHorizontally();
 			break;
 		case GLUT_KEY_LEFT: //rota alrededor de la escena hacia la izquierda
-			horizontalSceneAngle -= increment * 10;
-			rotateCameraAroundSceneHorizontally();
+			horizontalSceneAngle -= increment * 10 * upY;
+			radius = sqrt((xPosition * xPosition) + (zPosition * zPosition));
+			updateHorizontalRotationAroundScene(radius);
+			//rotateCameraAroundSceneHorizontally();
 			break;
 		}
 	}
