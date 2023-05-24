@@ -6,11 +6,14 @@
 
 const int W_WIDTH = 600; // Tama�o incial de la ventana
 const int W_HEIGHT = 600;
+int ancho = W_WIDTH;
+int alto = W_HEIGHT;
 GLfloat fAngulo; // Variable que indica el �ngulo de rotaci�n de los ejes. 
 int figura = 0;
 bool ejes=true;
 bool solid = false;
 bool planes = false;
+bool ortho = true;
 
 void drawAxes() {
 	glPushMatrix();
@@ -142,21 +145,21 @@ void reshape(int width, int height) {
 	//printf(" Etapa 2 = width: %d, height: %d\n", width, height);
 
 	printf(" Etapa 3 = width: %d, height: %d\n", width, height);
+	ancho = width;
+	alto = height;
 
 	glViewport(0, 0, (GLsizei)width, (GLsizei)height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	int ratio=width/height;
+	float ratio = (float)width / (float)height;
 
-	if (ratio >= 1.0) {
-		//glOrtho(-1.0 * ratio, 1.0f * ratio, -1.0, 1.0f, -1.0, 1.0f);
+	if (ortho) {
+		glOrtho(-10.f * ratio, 10.0f * ratio, -10.0f, 10.0f, -1.0f, 100.0f);
+	} else {
 		glFrustum(-1.0 * ratio, 1.0f * ratio, -1.0, 1.0f, 1.0f, 500.0f);
 	}
-	else {
-		//glOrtho(-1.0, 1.0f, -1.0 / ratio, 1.0f / ratio, -1.0, 1.0f);
-		glFrustum(-1.0, 1.0f, -1.0/ratio, 1.0f/ratio, 1.0f, 500.0f);
-	}
+	printf("L plus ratio = %f \n", ratio);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -185,6 +188,10 @@ void userInput(unsigned char key, int x, int y) {
 			break;
 		case 's':
 			solid = !solid;
+			break;
+		case 'o':
+			ortho = !ortho;
+			reshape(ancho, alto);
 			break;
 		default:
 			figura = 0;
