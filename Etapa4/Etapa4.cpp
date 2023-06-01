@@ -443,18 +443,18 @@ void cameraMovement(int key, int x, int y) {
 			break;
 		case GLUT_KEY_RIGHT: //Nos movemos lateralmente hacia la derecha
 			radiansHorizontal = gradsToRads(horizontalCameraAngle);
-			xPosition -= increment * cos(radiansHorizontal);
-			centerX -= increment * cos(radiansHorizontal);
-			zPosition += increment * sin(radiansHorizontal);
-			centerZ += increment * sin(radiansHorizontal);
+			xPosition -= increment * cos(radiansHorizontal) * upY;
+			centerX -= increment * cos(radiansHorizontal) * upY;
+			zPosition += increment * sin(radiansHorizontal) * upY;
+			centerZ += increment * sin(radiansHorizontal) * upY;
 			printf("xPosition = %f || zPosition = %f \n", xPosition, zPosition);
 			break;
 		case GLUT_KEY_LEFT: //Nos movemos lateralmente hacia la izquierda
 			radiansHorizontal = gradsToRads(horizontalCameraAngle);
-			xPosition += increment * cos(radiansHorizontal);
-			zPosition -= increment * sin(radiansHorizontal);
-			centerX += increment * cos(radiansHorizontal);
-			centerZ -= increment * sin(radiansHorizontal);
+			xPosition += increment * cos(radiansHorizontal) * upY;
+			zPosition -= increment * sin(radiansHorizontal) * upY;
+			centerX += increment * cos(radiansHorizontal) * upY;
+			centerZ -= increment * sin(radiansHorizontal) * upY;
 			printf("xPosition = %f || zPosition = %f \n", xPosition, zPosition);
 			break;
 		}
@@ -551,7 +551,7 @@ int main(int argc, char** argv) {
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
 
 	// Creamos la nueva ventana
-	glutCreateWindow("Etapa 3");
+	glutCreateWindow("Etapa 4");
 
 	// Indicamos cuales son las funciones de redibujado e idle
 	glutDisplayFunc(display);
